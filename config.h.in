@@ -1,0 +1,14 @@
+﻿#pragma once
+
+#include <string>
+
+namespace sat {
+namespace config {
+
+inline int getVersionMajor() { return @NANOSAT_VERSION_MAJOR@; }
+inline int getVersionMinor() { return @NANOSAT_VERSION_MINOR@; }
+inline std::string getInstallDirectory()   { return "@NANOSAT_INSTALL_DIR@";   }
+inline std::string getVersion() { return std::to_string(getVersionMajor()) + "." + std::to_string(getVersionMinor()); }
+
+} // namespace config
+} // namespace sat

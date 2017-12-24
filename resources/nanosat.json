@@ -1,0 +1,117 @@
+{
+	"global": {
+    "logFilePath": "/home/pi/Desktop/nanosat.log",
+    "logLevel": "warn" 
+	},
+	"nanoSat": {
+		"camera": {
+			"deviceID": "Raspberry_Pi_camera"
+		},
+    "coils": [
+      {
+        "address": "0x61",
+        "axis": "X",
+        "deviceID": "coil_x",
+        "num": 0
+      },
+      {
+        "address": "0x61",
+        "axis": "Y",
+        "deviceID": "coil_1",
+        "num": 1
+      },
+      {
+        "address": "0x61",
+        "axis": "Z",
+        "deviceID": "coil_z",
+        "num": 2
+      }
+    ],
+    "controller": {
+      "kp": 0.02,
+      "ki": 0.0,
+      "kd": 0.01,
+      "tolerance": 1.5
+    },
+		"currentSensors": [
+      {
+        "address": "0x40",
+        "axis": "X",
+        "deviceID": "current_sensor_x"
+      },
+      {
+        "address": "0x41",
+        "axis": "Y",
+        "deviceID": "current_sensor_y"
+      },
+      {
+        "address": "0x44",
+        "axis": "Z",
+        "deviceID": "current_sensor_z"
+      }
+		],
+		"powerBoard": {
+      "address": "0x0B",
+      "deviceID": "Mopi_power_board" 
+		},
+    "dcMotors": [
+      {
+        "address": "0x60",
+        "axis": "X",
+        "deviceID": "motor_x",
+        "num": 0
+      },
+      {
+        "address": "0x60",
+        "axis": "Y",
+        "deviceID": "motor_y",
+        "num": 1
+      },
+      {
+        "address": "0x60",
+        "axis": "Z",
+        "deviceID": "motor_z",
+        "num": 2
+      }
+		],
+    "imu": {
+      "deviceID": "IMU_10_DOF",
+      "accelerometer": {
+        "address": "0x53",
+        "axis": "all",
+        "deviceID": "ADXL345_Accelerometer",
+        "gains": [ 3.788, 3.952, 3.876 ], // gains must be positive
+        //"offsets": [ 0, -7, 0 ],
+        "rotationMat": [ 0, -1, 0, 0, 0, 1, 1, 0, 0 ] // "rotationMat": [ 0, 1, 0, 0, 0, -1, -1, 0, 0 ]
+      },
+      "gyroscope": {
+        "address": "0x68",
+        "axis": "all",
+        "deviceID": "ITG3200_Gyroscope",
+        "gains": [ 10.112, 9.096, 10.101 ], // gains must be positive
+        "rotationMat": [ 0, 1, 0, 0, 0, -1, -1, 0, 0 ]
+      },
+      "magnetometer": {
+        "address": "0x1E",
+        "axis": "all",
+        "deviceID": "HMC5883L_3Axis_Magnetometer",
+        "gains": [ 0.8609, 1.4012, 0.8969 ], // gains must be positive
+        "offsets": [ -184, 34, -344 ], //"offsets": [ -184, -34, 344 ],
+        "rotationMat": [ 0, 0, 1, 0, -1, 0, -1, 0, 0 ]
+      },
+      "pressureSensor": {
+        "address": "0x77",
+        "deviceID": "BMP085_pressure_sensor"
+      },
+      "sensorFusion": {
+        "kp": 0.5,
+        "ki": 0.1
+      }
+
+    },
+		"temperatureSensor": {
+			"address": "0x18",
+			"deviceID": "temperature_sensor"
+		}
+	}
+}
