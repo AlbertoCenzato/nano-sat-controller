@@ -1,18 +1,24 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.8)
 project(NanoSatController)
 
 add_definitions(-std=c++14)
 
 
 ## find opencv and if not found download, compile and install it
-find_package(OpenCV COMPONENTS video videoio imgproc)
-if (NOT OpenCV_FOUND)
-	message(STATUS "OpenCV not found. Downloading and installing")
-	set (OpenCV_INSTALL_PREFIX /usr/local/opencv-3.3)
-	execute_process(COMMAND bash ./scripts/opencv-installer.sh ${OpenCV_INSTALL_PREFIX} WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
-	set (OpenCV_DIR ${OpenCV_INSTALL_PREFIX})
+if (UNIX)
+	find_package(OpenCV COMPONENTS video videoio imgproc)
+	if (NOT OpenCV_FOUND)
+		message(STATUS "OpenCV not found. Downloading and installing")
+		set (OpenCV_INSTALL_PREFIX /usr/local/opencv-3.3)
+		execute_process(COMMAND bash ./scripts/opencv-installer.sh ${OpenCV_INSTALL_PREFIX} WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+		set (OpenCV_DIR ${OpenCV_INSTALL_PREFIX})
+		find_package(OpenCV REQUIRED COMPONENTS video videoio imgproc)
+	endif (NOT OpenCV_FOUND)
+else (WIN32)
+	set (CMAKE_TOOLCHAIN_FILE C:/Users/alber/git/vcpkg/scripts/buildsystems/vcpkg.cmake)
 	find_package(OpenCV REQUIRED COMPONENTS video videoio imgproc)
-endif (NOT OpenCV_FOUND)
+endif (UNIX)
+
 set(OpenCV_LIBS opencv_core opencv_video opencv_videoio opencv_highgui opencv_imgproc opencv_imgcodecs)
 
 ## add configuration file
