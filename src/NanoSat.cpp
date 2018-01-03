@@ -37,52 +37,62 @@ using sat::utils::Vector4f;
 using sat::utils::Matrix3f3;
 using sat::utils::Logger;
 
-namespace sat
-{
+namespace sat {
 
 // ---------- constructors ----------
 #pragma region constructors
 
 NanoSat::NanoSat(const NanoSatSettings &settings) : controller(settings.controller) {
 
-	// sensors initialization
+	//--- sensors initialization ---
 
 	// current sensors
+	Log::info << "Current sensors initialization...";
 	for (const auto& currSettings : settings.currentSensors)
 		currSensorDesc.emplace_back(CurrentSensor::create(&bus, currSettings), currSettings.axis);
 
 	//temperature sensors
+	Log::info << "Temperature sensor initialization...";
 	auto &tempSettings = settings.temperatureSensor;
-	tempSensorDesc = DeviceDescriptor<TemperatureSensor>(TemperatureSensor::create(&bus, tempSettings), tempSettings.axis);
+	tempSensorDesc = AttachedDevice<TemperatureSensor>(TemperatureSensor::create(&bus, tempSettings), tempSettings.axis);
 
 	// inertial measurement unit initialization
-   std::cout << "Initializing imu..." << std::endl;
-	imuDesc = DeviceDescriptor<IMU10DOF>(IMU10DOF::create(&bus, settings.imu), Axis::ALL);
-   std::cout << "Done!" << std::endl;
+   Log::info << "IMU initialization...";
+	imuDesc = AttachedDevice<IMU10DOF>(IMU10DOF::create(&bus, settings.imu), Axis::ALL);
 	
 	// alignment sensor
+	Log::info << "Alignment sensor initialization...";
 	auto &alignSettings = settings.camera;
-	alignmentSensorDesc = DeviceDescriptor<AlignmentSensor>(AlignmentSensor::create(alignSettings), alignSettings.axis);
+	alignmentSensorDesc = AttachedDevice<AlignmentSensor>(AlignmentSensor::create(alignSettings), alignSettings.axis);
 
    // power board
+	Log::info << "Power board initialization...";
    auto &pwBoardSettings = settings.pwBoard;
-   pwBoardDesc = DeviceDescriptor<PowerBoard>(PowerBoard::create(&bus, pwBoardSettings), Axis::NONE);
+   pwBoardDesc = AttachedDevice<PowerBoard>(PowerBoard::create(&bus, pwBoardSettings), Axis::NONE);
 
-	// actuators initialization
+
+	//--- actuators initialization ---
+
+	// dc motors
+	Log::info << "DC motors initialization...";
 	for (const auto& motorSettings : settings.dcMotors)
 		motorDesc.emplace_back(MotorActuator::create(&bus, motorSettings), motorSettings.axis);
 
+	// coils
+	Log::info << "Coils initialization...";
 	for (const auto& coilSettings : settings.coils) {
 		auto axis = coilSettings.axis;
 		coilDesc.emplace_back(FeedbackCoil::create(&bus, coilSettings, getCurrentSensor(axis)), axis);
 	}
 
+	//--- test all the devices ---
 	auto testResult = selfTest();
 	if(testResult.hasErrOrWarn())
 	   Log::err << testResult;
 }
 
 NanoSat::~NanoSat() { }
+
 #pragma endregion constructors
 
 
@@ -195,7 +205,6 @@ vector<ISensor*> NanoSat::getSensorsList(Axis axis) const {
 }
 
 bool NanoSat::performHoming() {
-
    ctrl::Operation op;
    op.actuatorX = getDCMotor(Axis::X);
    op.actuatorY = getDCMotor(Axis::Y);
@@ -203,12 +212,11 @@ bool NanoSat::performHoming() {
    op.imu = getIMU();
    op.finalState = {0.f, 0.f, 0.f};
 	
-	cout << "Moving..." << endl;
+	Log::info << "Going home...";
 	return move(op);
 }
 
 bool NanoSat::move(ctrl::Operation op) {
-	
 	auto success = controller.addOperation(op).run();
 	controller.clearOperations(); // ensure to clear the maneuver list whatever the result of run() is
 
