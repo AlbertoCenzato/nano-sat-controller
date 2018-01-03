@@ -33,7 +33,7 @@ namespace utils {
  */
 struct SettingsBase {
 
-	virtual ~SettingsBase() { }
+	virtual ~SettingsBase() = default;
 
 	virtual void load(const Json::Value& value) = 0;
 };
@@ -69,7 +69,7 @@ struct IMUSensorsSettings : DeviceI2CSettings {
 
 	Vector3f offsets;
 	Vector3f gains;
-	utils::RotationMat rotationMat;
+	RotationMat rotationMat;
 
    void load(const Json::Value& value) override;
 };
@@ -80,7 +80,7 @@ struct IMUSensorsSettings : DeviceI2CSettings {
  */
 struct AccelerometerSettigs : IMUSensorsSettings {
 
-	AccelerometerSettigs() { }
+	AccelerometerSettigs() = default;
 	explicit AccelerometerSettigs(const Json::Value& value) {
       AccelerometerSettigs::load(value);
 	}
@@ -96,7 +96,7 @@ struct GyroscopeSettings : IMUSensorsSettings {
 
 	std::array<bool, 3> polarity;
 
-	GyroscopeSettings() { }
+	GyroscopeSettings() = default;
 	explicit GyroscopeSettings(const Json::Value& value) {
       GyroscopeSettings::load(value);
 	}
@@ -112,7 +112,7 @@ struct MagnetometerSettings : IMUSensorsSettings {
 
 	float scale = 1.f;
 
-	MagnetometerSettings() { }
+	MagnetometerSettings() = default;
 	explicit MagnetometerSettings(const Json::Value& value) {
       MagnetometerSettings::load(value);
 	}
@@ -125,7 +125,7 @@ struct MagnetometerSettings : IMUSensorsSettings {
  *	@brief Settings class for PressureSensor
  */
 struct PressureSensorSettings : DeviceI2CSettings {
-	PressureSensorSettings() { }
+	PressureSensorSettings() = default;
 	explicit PressureSensorSettings(const Json::Value& value) {
       PressureSensorSettings::load(value);
 	}
@@ -139,7 +139,7 @@ struct SensorFusionSettings : SettingsBase {
    float kp = 0.5f;
    float ki = 0.1f;
 
-   SensorFusionSettings() { }
+   SensorFusionSettings() = default;
    explicit SensorFusionSettings(const Json::Value& value) {
       SensorFusionSettings::load(value);
    }
@@ -157,7 +157,7 @@ struct IMUSettings : DeviceI2CSettings {
 	PressureSensorSettings pressureSensor;
    SensorFusionSettings   sensorFusion;
 
-	IMUSettings() { }
+	IMUSettings() = default;
 	explicit IMUSettings(const Json::Value& value) {
       IMUSettings::load(value);
 	}
@@ -172,7 +172,7 @@ struct IMUSettings : DeviceI2CSettings {
 struct MotorSettings : DeviceI2CSettings {
 	int num = 0;
 
-	MotorSettings() { }
+	MotorSettings() = default;
 	explicit MotorSettings(const Json::Value& value) {
       MotorSettings::load(value);
 	}
@@ -186,7 +186,7 @@ struct MotorSettings : DeviceI2CSettings {
  */
 struct CurrentSensorSettings : DeviceI2CSettings {
 
-	CurrentSensorSettings() { }
+	CurrentSensorSettings() = default;
 	explicit CurrentSensorSettings(const Json::Value& value) {
       CurrentSensorSettings::load(value);
 	}
@@ -199,7 +199,7 @@ struct CurrentSensorSettings : DeviceI2CSettings {
  *	@brief Settings class for TemperatureSensor
  */
 struct TemperatureSensorSettings : DeviceI2CSettings {
-	TemperatureSensorSettings() { }
+	TemperatureSensorSettings() = default;
 	explicit TemperatureSensorSettings(const Json::Value& value) {
       TemperatureSensorSettings::load(value);
 	}
@@ -212,7 +212,7 @@ struct TemperatureSensorSettings : DeviceI2CSettings {
  * @brief Settings struct for PowerBoard
  */
 struct PowerBoardSettings : DeviceI2CSettings {
-   PowerBoardSettings() { }
+   PowerBoardSettings() = default;
    explicit PowerBoardSettings(const Json::Value& value) {
       PowerBoardSettings::load(value);
    }
@@ -225,7 +225,7 @@ struct PowerBoardSettings : DeviceI2CSettings {
  */
 struct AlignmentSensorSettings : DeviceSettings {
 
-	AlignmentSensorSettings() { }
+	AlignmentSensorSettings() = default;
 	explicit AlignmentSensorSettings(const Json::Value& value) {
       AlignmentSensorSettings::load(value);
 	}
@@ -244,7 +244,7 @@ struct ControllerSettings : SettingsBase {
    float ki = 0.f;
    float kd = 0.f;
 
-	ControllerSettings() { }
+	ControllerSettings() = default;
 	explicit ControllerSettings(const Json::Value& value) {
       ControllerSettings::load(value);
 	}
@@ -269,7 +269,7 @@ struct NanoSatSettings : SettingsBase {
 
 	ControllerSettings	controller;
 
-	NanoSatSettings() { }
+	NanoSatSettings() = default;
 	explicit NanoSatSettings(const Json::Value& value) {
       NanoSatSettings::load(value);
 	}
@@ -290,7 +290,7 @@ struct GlobalSettings : SettingsBase {
 	std::string logFilePath;
    LogLevel logLevel;
 
-	GlobalSettings() { }
+	GlobalSettings() = default;
 	explicit GlobalSettings(const Json::Value& value) {
       GlobalSettings::load(value);
 	}

@@ -15,7 +15,6 @@ if (UNIX)
 		find_package(OpenCV REQUIRED COMPONENTS video videoio imgproc)
 	endif (NOT OpenCV_FOUND)
 else (WIN32) # used to find includes when modifying the project on windows
-	set (CMAKE_TOOLCHAIN_FILE C:/Users/alber/git/vcpkg/scripts/buildsystems/vcpkg.cmake)
 	find_package(opencv REQUIRED COMPONENTS video videoio imgproc)
 endif (UNIX)
 
