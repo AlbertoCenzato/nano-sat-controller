@@ -4,7 +4,6 @@
 #include "config.h"
 #include "NanoSat.hpp"
 #include "test/Test.hpp"
-#include "utils/Logger.hpp"
 #include "utils/UI.hpp"
 #include "utils/Settings.hpp"
 #include "utils/OSSignalHandler.hpp"
