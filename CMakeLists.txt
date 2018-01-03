@@ -5,7 +5,7 @@ add_definitions(-std=c++14)
 
 
 ## find opencv and if not found download, compile and install it
-if (UNIX)
+if (UNIX) 
 	find_package(OpenCV COMPONENTS video videoio imgproc)
 	if (NOT OpenCV_FOUND)
 		message(STATUS "OpenCV not found. Downloading and installing")
@@ -14,9 +14,9 @@ if (UNIX)
 		set (OpenCV_DIR ${OpenCV_INSTALL_PREFIX})
 		find_package(OpenCV REQUIRED COMPONENTS video videoio imgproc)
 	endif (NOT OpenCV_FOUND)
-else (WIN32)
+else (WIN32) # used to find includes when modifying the project on windows
 	set (CMAKE_TOOLCHAIN_FILE C:/Users/alber/git/vcpkg/scripts/buildsystems/vcpkg.cmake)
-	find_package(OpenCV REQUIRED COMPONENTS video videoio imgproc)
+	find_package(opencv REQUIRED COMPONENTS video videoio imgproc)
 endif (UNIX)
 
 set(OpenCV_LIBS opencv_core opencv_video opencv_videoio opencv_highgui opencv_imgproc opencv_imgcodecs)
