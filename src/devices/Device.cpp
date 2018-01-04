@@ -26,28 +26,25 @@ namespace device {
 
 const string Device::DEFAULT_DEV_ID = "Generic_device";
 
-Device::Device(const string &deviceId) : available(true), deviceID(deviceId) {
+Device::Device(string deviceId) : available(true), deviceID(std::move(deviceId)) {
 	addTestAndAction(&Device::testConnection, &Device::disableDevice);
 }
 
-Device::~Device() { }
+//Device::~Device() { }
 
 TestResult Device::selfTest() noexcept {
 	TestResult result;
 	try {
 		for (auto& testAndAction : testsAndActions) {
-			auto res = testAndAction.first();
+			auto res = testAndAction.first();   // call test function
 			result.add(res);
-			if (res.hasErrOrWarn()) {
-				bool continueTesting = testAndAction.second();
-				if (!continueTesting) {
+			if (res.hasErrOrWarn()) {  
+				bool continueTesting = testAndAction.second(); // if errors, call the recovery action function
+				if (!continueTesting)
 					break;
-				}
 			}
-		}
-			
-	}
-	catch (const std::bad_function_call& ex) {
+		}	
+   } catch (const std::bad_function_call& ex) {
 		Log::err << "ERROR! Bad test function call for " + deviceID + "!";
       Log::err << ex.what();
       Log::err << "\nDevice disabled.";
@@ -65,21 +62,21 @@ TestResult Device::selfTest() noexcept {
 	return result;
 }
 
-bool Device::noAction() const {
+bool Device::noAction() const noexcept {
 	return true;
 }
 
 
-bool Device::isAvailable() const {
+bool Device::isAvailable() const noexcept {
 	return available;
 }
 
-bool Device::disableDevice() {
+bool Device::disableDevice() noexcept {
 	available = false;
 	return false;
 }
 
-std::string Device::getID() const {
+std::string Device::getID() const noexcept {
 	return deviceID;
 }
 

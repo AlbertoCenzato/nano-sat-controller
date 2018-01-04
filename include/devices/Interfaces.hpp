@@ -17,42 +17,44 @@ GNU License V2 for more details: https://www.gnu.org/licenses/gpl-2.0.html
 
 #include "self_test/TestResult.hpp"
 
-namespace sat
-{
+/* ----------------------------------------------------------------------
+ * - This file contains all the interfaces (ABCs) needed by the devices -
+ * ----------------------------------------------------------------------*/
+
+namespace sat {
 
 // forward declaration
 namespace utils { template<typename T, int dim> class Vector; }
 
 namespace device {
 
+
+/**
+ * @brief A generic device with a device ID and the possibility to 
+ *        perform self tests
+ */
 class IDevice {
 
 public:
 
-	virtual ~IDevice() { }
+	virtual ~IDevice() = default;
 
 	/**
-	 * @brief Safely calls all test-action pairs of functions of the device.
-	 *			 For each pair the test function is called and, in case it fails
-	 *			 (TestResult.hasErrOrWarn() == true), the recovery action function
-	 *			 is called. If action function returns true the remaining tests
-	 *			 are executed, if false no more tests are performed.
-	 * \return contains the list of results produced by the test functions
+	 * @brief safely executes all tests associated to the device 
+	 *        and returns their results
 	 */
 	virtual TestResult selfTest() noexcept = 0;
 
 	/**
-	 * @brief Gives the status of the device. To have an updated result
-	 *			 selfTest() must be explicitly called before isAvailable(),
-	 *			 this function does not update the status of the device.
-	 * \return true if the device is connected and working
+	 * @brief Gives the availability status of the device.
+	 * @return true if the device is connected and working.
 	 */
-	virtual bool isAvailable() const = 0;
+	virtual bool isAvailable() const noexcept = 0;
 
 	/**
 	 *	@brief Returns the device ID
 	 */
-	virtual std::string getID() const = 0;
+	virtual std::string getID() const noexcept = 0;
 
 	/**
 	 *	@brief Returns a string describing the device
@@ -69,7 +71,7 @@ public:
 class ISensor : virtual public IDevice {
 public:
 
-	virtual ~ISensor() { }
+	virtual ~ISensor() = default;
 
 	virtual std::vector<double> read() const = 0;
 };
@@ -83,9 +85,8 @@ public:
 class IActuator : virtual public IDevice {
 public:
 
-	IActuator() { }
-
-	virtual ~IActuator() { }
+	IActuator() = default;  // TODO: remove
+	virtual ~IActuator() = default;
 
 	virtual void act(float action) = 0;
 };
@@ -93,12 +94,12 @@ public:
 
 /**
  *	@brief This interface represents a device capable of
- *			 acting in some way
+ *			 running a low level feedback loop while acting
  */
 class IFeedbackActuator : public IActuator {
 public:
 
-	virtual ~IFeedbackActuator() { }
+	virtual ~IFeedbackActuator() = default;
 
 	// TODO: give a better name
 	virtual void lowLevelFeedbackLoop(float action) = 0;
@@ -113,8 +114,8 @@ public:
 class IIMU : public ISensor {
 public:
 
-	IIMU() : ISensor() { }
-	virtual ~IIMU() { }
+	IIMU() = default;
+	virtual ~IIMU() = default;
 
 	/**
 	 * @biref Gives the rotation around X, Y and Z axis
@@ -126,8 +127,6 @@ public:
 
 typedef std::unique_ptr<ISensor>   SensorPtr;
 typedef std::unique_ptr<IActuator> ActuatorPtr;
-
-
 
 }	// namespace device
 }	// namespace sat

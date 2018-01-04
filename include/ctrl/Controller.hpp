@@ -46,7 +46,7 @@ namespace ctrl {
  * @brief Sets current thread to maximum priority
  * @throws sat::utils::scheduling_error
  */
-void setMaxSchedulingPriority();
+void setMaxSchedulingPriority() throw(sat::utils::scheduling_error);
 
 /**
  *	@brief Operation defines what state the nano sat should reach 
