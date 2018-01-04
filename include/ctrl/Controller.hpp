@@ -62,54 +62,54 @@ struct Operation {
 	utils::Vector3f finalState;
 
    std::string toString() const noexcept;
-
-   //friend class Controller;
 };
 
 
 
 /**
- * @brief This class is used by NanoSat to sequentially execute all the maneuver
- *		  it is given. The control loop is executed in a real-time high priority
- *		  thread different from the main program thread
+ * @brief This class is used by NanoSat to sequentially execute all the operations
+ *		    it is given. 
+ * @note If possible curent thread is executed as a real-time high priority
+ *		   thread when executing the control loop.
  */
 class Controller {
 public:
+
 	explicit Controller(const utils::ControllerSettings& settings = utils::ControllerSettings());
 	~Controller() = default;
 
 
 	/**
 	 * @brief Adds an operation to the list of maneuvers to execute
-	 * @param op: operation to do. It is required all op's members to be set
-	 *            to not null values
+	 * @param op: operation to do. It is required all op's members to be not null
+	 * @return a reference to this Controller object so multiple operations can be added
+	 *         (e.g. controller.addOperation(op1).addOperation(op2).addOperation(op3).run();)
 	 */
 	Controller& addOperation(Operation op);
 
 	/**
-	 * @brief Removes all maneuvers from maneuver list
+	 * @brief Removes all operations from operation list
 	 */
 	void clearOperations();
 
 	/**
-	 *	@brief Executes sequentially all the maneuvers added to this controller
-	 *			 (with FIFO policy). The controller uses actuators of the maneuver
-	 *			 to reach the final state specified by the maneuver. To compare current
-	 *			 state with final state controller's tolerance is used.
-	 *			 When all maneuvers are completed successfully maneuvers list is cleared.
+	 *	@brief Executes sequentially all the operations added to this controller
+	 *			 (with FIFO policy). The controller uses actuators specified by the operation
+	 *			 to reach the final state. To compare current state with final state 
+	 *			 controller's tolerance is used.
+	 *			 When all operations are completed successfully operation list is cleared.
 	 *	@return true if no error occurs
 	 */
 	bool run();
 
 	/**
-	 *	@brief Returns the tolerance run() function uses to compare two states 
+	 *	@brief Returns the tolerance run() function uses to compare current and final state.
 	 */
 	float getTolerance() const;
 
 
 	/**
-	 *	@brief Specifies the control function to be used (default control function
-	 *			 is a PID)
+	 *	@brief Specifies the control function to be used (default control function is a PID)
 	 */
 	void setControlFunction(std::unique_ptr<ControlAlgorithm<utils::Vector3f>>&& controlFunction);
 
@@ -121,6 +121,7 @@ private:
    const int MEASUREMENTS_PER_CONTROL = 10;
 
    /**
+    * @brief private version of run(), it executes the control loop
     * TODO: this function should be noexcept. 
     * See function definition for what is missing to be noexcept
     */
@@ -129,7 +130,7 @@ private:
 	/**
 	*	@brief checks if the given operation is properly defined;
 	*			 i.e. it has all actuators necessary to get to the final state.
-	*			 Called by move before passing the operation to the controller.
+	*			 Called by run() before passing the operation to the controller.
 	*	@param op: operation to check.
 	*/
 	bool checkIfValid(const ctrl::Operation& op) const;

@@ -73,7 +73,6 @@ Controller::Controller(const utils::ControllerSettings& settings)
 
 
 Controller& Controller::addOperation(Operation op) {
-	std::cout << "Adding operation to opList" << std::endl;
 	opList.push_back(op);
 	return *this;
 }
@@ -86,7 +85,6 @@ bool Controller::run() {
          Log::err << "INVALID OPERATION: " << op.toString();
          return false;
       }
-      std::cout << "Operation validation: passed" << std::endl;
    }
 
    // TODO: run_ should be noexcept to safely terminate 
@@ -107,7 +105,7 @@ float Controller::getTolerance() const {
 }
 
 void Controller::setControlFunction(std::unique_ptr<ControlAlgorithm<utils::Vector3f>>&& controlFunction) {
-	this->controlFunction = move(controlFunction);
+	this->controlFunction = std::move(controlFunction);
 }
 
 
@@ -121,8 +119,8 @@ void Controller::run_() {
       const std::string message("Error while increasing controller thread priority!");
       Log::err << message;
       Log::err << sched_err.what();
-      cerr << message << endl;
-      cerr << sched_err.what() << endl;
+      std::cerr << message << std::endl;
+      std::cerr << sched_err.what() << std::endl;
    }
 
 	// perform sequentially all operations in the list
@@ -131,10 +129,12 @@ void Controller::run_() {
       assert(op.actuatorX != nullptr && op.actuatorY != nullptr 
          && op.actuatorZ != nullptr && op.imu != nullptr);
 
-		cout << "Trying operation: " << op.toString() << endl;
+		Log::info << "Trying operation: " << op.toString();
+      std::cout << "Trying operation: " << op.toString() << std::endl;
 
+      // ask for user confirmation
 		if (!utils::ui::yesNoAnswer("Go?")) {
-			cout << "Aborting operation" << endl;
+			std::cout << "Aborting operation." << std::endl;
 			controlThreadReturnVal = false;
 			return;
 		}
@@ -145,9 +145,10 @@ void Controller::run_() {
 			auto actuatorX = op.actuatorX;
 			auto actuatorY = op.actuatorY;
 			auto actuatorZ = op.actuatorZ;
-         //imu->startReading();
 			auto state = imu->getState();
 			Vector3f lastControlOutput{0.f,0.f,0.f};
+
+         // execute control loop
 			while (/*!equalsWithTolerance(state, finalState, tolerance)*/true) {
 
 				// compute feedback control
