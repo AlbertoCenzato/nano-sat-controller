@@ -29,12 +29,11 @@ class FeedbackCoil : public MotorActuator {
 	
 public:
 	FeedbackCoil();
-	FeedbackCoil(gnublin_i2c *bus, const utils::MotorSettings &settings, 
-					 const CurrentSensor *feedbackSensor);
+	FeedbackCoil(const utils::MotorSettings &settings, const CurrentSensor *feedbackSensor);
 
 	void act(float action) override;
 
-	static std::unique_ptr<FeedbackCoil> create(gnublin_i2c *bus, const utils::MotorSettings& settings,
+	static std::unique_ptr<FeedbackCoil> create(const utils::MotorSettings& settings,
 												const CurrentSensor *feedbackSensor);
 
 protected:

@@ -30,7 +30,7 @@ public:
 	int speed = 0;
 
 	MotorActuator();
-	MotorActuator(gnublin_i2c *bus, const utils::MotorSettings &settings);
+	MotorActuator(const utils::MotorSettings &settings);
 	virtual ~MotorActuator();
 
 	void run(int command);
@@ -48,7 +48,7 @@ public:
 	 */
 	void act(float action) override;
 
-	static std::unique_ptr<MotorActuator> create(gnublin_i2c *bus, const utils::MotorSettings& settings);
+	static std::unique_ptr<MotorActuator> create(const utils::MotorSettings& settings);
 
 	TestResult testConnection() override;
 

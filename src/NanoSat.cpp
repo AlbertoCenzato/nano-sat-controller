@@ -49,16 +49,16 @@ NanoSat::NanoSat(const NanoSatSettings &settings) : controller(settings.controll
 	// current sensors
 	Log::info << "Current sensors initialization...";
 	for (const auto& currSettings : settings.currentSensors)
-		currSensorDesc.emplace_back(CurrentSensor::create(&bus, currSettings), currSettings.axis);
+		currSensorDesc.emplace_back(CurrentSensor::create(currSettings), currSettings.axis);
 
 	//temperature sensors
 	Log::info << "Temperature sensor initialization...";
 	auto &tempSettings = settings.temperatureSensor;
-	tempSensorDesc = AttachedDevice<TemperatureSensor>(TemperatureSensor::create(&bus, tempSettings), tempSettings.axis);
+	tempSensorDesc = AttachedDevice<TemperatureSensor>(TemperatureSensor::create(tempSettings), tempSettings.axis);
 
 	// inertial measurement unit initialization
    Log::info << "IMU initialization...";
-	imuDesc = AttachedDevice<IMU10DOF>(IMU10DOF::create(&bus, settings.imu), Axis::ALL);
+	imuDesc = AttachedDevice<IMU10DOF>(IMU10DOF::create(settings.imu), Axis::ALL);
 	
 	// alignment sensor
 	Log::info << "Alignment sensor initialization...";
@@ -68,7 +68,7 @@ NanoSat::NanoSat(const NanoSatSettings &settings) : controller(settings.controll
    // power board
 	Log::info << "Power board initialization...";
    auto &pwBoardSettings = settings.pwBoard;
-   pwBoardDesc = AttachedDevice<PowerBoard>(PowerBoard::create(&bus, pwBoardSettings), Axis::NONE);
+   pwBoardDesc = AttachedDevice<PowerBoard>(PowerBoard::create(pwBoardSettings), Axis::NONE);
 
 
 	//--- actuators initialization ---
@@ -76,13 +76,13 @@ NanoSat::NanoSat(const NanoSatSettings &settings) : controller(settings.controll
 	// dc motors
 	Log::info << "DC motors initialization...";
 	for (const auto& motorSettings : settings.dcMotors)
-		motorDesc.emplace_back(MotorActuator::create(&bus, motorSettings), motorSettings.axis);
+		motorDesc.emplace_back(MotorActuator::create(motorSettings), motorSettings.axis);
 
 	// coils
 	Log::info << "Coils initialization...";
 	for (const auto& coilSettings : settings.coils) {
 		auto axis = coilSettings.axis;
-		coilDesc.emplace_back(FeedbackCoil::create(&bus, coilSettings, getCurrentSensor(axis)), axis);
+		coilDesc.emplace_back(FeedbackCoil::create(coilSettings, getCurrentSensor(axis)), axis);
 	}
 
 	//--- test all the devices ---

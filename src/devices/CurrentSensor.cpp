@@ -108,9 +108,10 @@ const chrono::seconds CurrentSensor::DEVICE_RESET_TIME = chrono::seconds(1);
 #pragma region constructors
 
 CurrentSensor::CurrentSensor() : DeviceI2C() { }
-CurrentSensor::CurrentSensor(gnublin_i2c *bus, const utils::CurrentSensorSettings& settings)
-	: DeviceI2C(settings.deviceID, bus, settings.address) {
+CurrentSensor::CurrentSensor(const utils::CurrentSensorSettings& settings)
+	: DeviceI2C(settings.deviceID, settings.address) {
 
+	// TODO: use addTestAndAction()
 	//addTestAndAction(testValues, noAction);
 	testsAndActions.emplace_back(std::bind(&CurrentSensor::testValues, this),
 										  std::bind(&CurrentSensor::noAction, this));
@@ -391,8 +392,8 @@ float CurrentSensor::getShuntVoltage_mV() const {
 	return int16_t(value_raw) * 0.01f;
 }
 
-std::unique_ptr<CurrentSensor> CurrentSensor::create(gnublin_i2c* bus, const utils::CurrentSensorSettings& settings) {
-	return std::make_unique<CurrentSensor>(bus, settings);
+std::unique_ptr<CurrentSensor> CurrentSensor::create(const utils::CurrentSensorSettings& settings) {
+	return std::make_unique<CurrentSensor>(settings);
 }
 
 

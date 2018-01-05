@@ -43,7 +43,7 @@ public:
 	static const uint8_t     DEFAULT_I2C_ADDR = 0x1E;
 
 	Magnetometer();
-	Magnetometer(gnublin_i2c *bus, const utils::MagnetometerSettings& settings);
+	Magnetometer(const utils::MagnetometerSettings& settings);
 
 	/**
 	 *	@brief Gives the magnetometer reading in Gauss along the three axis
@@ -64,7 +64,7 @@ public:
    void setGains(const utils::Vector3f& gains);
 	void setOffsets(const utils::Vector3f& offsets);
 
-	static std::unique_ptr<Magnetometer> create(gnublin_i2c *bus, const utils::MagnetometerSettings& settings);
+	static std::unique_ptr<Magnetometer> create(const utils::MagnetometerSettings& settings);
 
 	TestResult testConnection() override;
 

@@ -34,8 +34,8 @@ const string PressureSensor::DEFAULT_DEV_NAME = "BMP085_pressure_sensor";
 #pragma region constructors
 PressureSensor::PressureSensor() : DeviceI2C() { }
 
-PressureSensor::PressureSensor(gnublin_i2c *bus, const utils::PressureSensorSettings& settings)
-	: DeviceI2C(settings.deviceID, bus, settings.address) {
+PressureSensor::PressureSensor(const utils::PressureSensorSettings& settings)
+	: DeviceI2C(settings.deviceID, settings.address) {
 	
 	read16(AC1_REGISTER, ac1);
 	read16(AC2_REGISTER, ac2);
@@ -73,8 +73,8 @@ long PressureSensor::readPressureRaw() const {
 	return get_pressure(readUP());
 }
 
-std::unique_ptr<PressureSensor> PressureSensor::create(gnublin_i2c * bus, const utils::PressureSensorSettings & settings) {
-	return std::make_unique<PressureSensor>(bus, settings);
+std::unique_ptr<PressureSensor> PressureSensor::create(const utils::PressureSensorSettings & settings) {
+	return std::make_unique<PressureSensor>(settings);
 }
 
 #pragma endregion functions

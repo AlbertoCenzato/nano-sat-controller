@@ -55,8 +55,8 @@ const string Magnetometer::DEFAULT_DEV_NAME = "HMC5883L_3Axis_Magnetometer";
 
 Magnetometer::Magnetometer() : DeviceI2C() { }
 
-Magnetometer::Magnetometer(gnublin_i2c *bus, const utils::MagnetometerSettings& settings)
-	: DeviceI2C(settings.deviceID, bus, settings.address), offsets_(settings.offsets), gains_(settings.gains) {
+Magnetometer::Magnetometer(const utils::MagnetometerSettings& settings)
+	: DeviceI2C(settings.deviceID, settings.address), offsets_(settings.offsets), gains_(settings.gains) {
 
 	setMeasurementMode(Measurement_Continuous);
    //setGains(settings.gains);
@@ -159,8 +159,8 @@ void Magnetometer::setGains(const Vector3f& gains) {
 
 
 
-std::unique_ptr<Magnetometer> Magnetometer::create(gnublin_i2c * bus, const utils::MagnetometerSettings & settings) {
-	return std::make_unique<Magnetometer>(bus, settings);
+std::unique_ptr<Magnetometer> Magnetometer::create(const utils::MagnetometerSettings & settings) {
+	return std::make_unique<Magnetometer>(settings);
 }
 
 int Magnetometer::setMeasurementMode(uint8_t mode) {

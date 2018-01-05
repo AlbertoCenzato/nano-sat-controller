@@ -58,7 +58,7 @@ public:
 	static const uint8_t		 DEFAULT_I2C_ADDR = 0x18;
 
 	TemperatureSensor();
-	TemperatureSensor(gnublin_i2c *bus, const utils::TemperatureSensorSettings& settings);
+	TemperatureSensor(const utils::TemperatureSensorSettings& settings);
 
 	std::vector<double> read() const override;
 
@@ -74,7 +74,7 @@ public:
 	*/
 	int shutdown_wake(uint8_t sw_ID);
 
-	static std::unique_ptr<TemperatureSensor> create(gnublin_i2c *bus, const utils::TemperatureSensorSettings& settings);
+	static std::unique_ptr<TemperatureSensor> create(const utils::TemperatureSensorSettings& settings);
 
 	TestResult testConnection() override;
 	TestResult testValues() const;

@@ -57,7 +57,7 @@ private:
 
 public:
 
-   PowerBoard(gnublin_i2c *bus, const utils::PowerBoardSettings& settings);
+   PowerBoard(const utils::PowerBoardSettings& settings);
 
    std::vector<double> read() const override;
 
@@ -111,7 +111,7 @@ public:
 
    TestResult testConnection() override;
 
-   static std::unique_ptr<PowerBoard> create(gnublin_i2c *bus, const utils::PowerBoardSettings& settings);
+   static std::unique_ptr<PowerBoard> create(const utils::PowerBoardSettings& settings);
 
 };
 

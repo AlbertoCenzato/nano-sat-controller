@@ -53,7 +53,7 @@ public:
 	//utils::Vector3f polarities;
 
 	Gyroscope();
-	Gyroscope(gnublin_i2c *bus, const utils::GyroscopeSettings& settings);
+	Gyroscope(const utils::GyroscopeSettings& settings);
 
 	// Who Am I
 	void setDevAddr(unsigned int _addr);
@@ -118,7 +118,7 @@ public:
    }
 	
 	/**
-	 *	@brief Reads the angular rate (°/s) of the device
+	 *	@brief Reads the angular rate (ï¿½/s) of the device
 	 */
 	std::vector<double> read() const override;
 	utils::Vector3f readGyro() const; // includes gain and offset
@@ -137,7 +137,7 @@ public:
 	uint8_t getClockSource() const;
 	void setClockSource(uint8_t _CLKsource); // see register parameters above
 
-	static std::unique_ptr<Gyroscope> create(gnublin_i2c *bus, const utils::GyroscopeSettings& settings);
+	static std::unique_ptr<Gyroscope> create(const utils::GyroscopeSettings& settings);
 
 	TestResult testConnection() override;
 

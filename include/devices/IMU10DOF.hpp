@@ -43,7 +43,7 @@ public:
 	static const uint8_t	 DEFAULT_I2C_ADDR = 0xFF;	// virtual address given to IMU to figure as a sensor
 
 	IMU10DOF();
-	IMU10DOF(gnublin_i2c *bus, const utils::IMUSettings& settings);
+	IMU10DOF(const utils::IMUSettings& settings);
 
 
 	/**
@@ -108,7 +108,7 @@ public:
 
 	void setSensorFusionAlgorithm(std::unique_ptr<ctrl::IMUSensorFusionAlg>&& algorithm);
 
-	static std::unique_ptr<IMU10DOF> create(gnublin_i2c *bus, const utils::IMUSettings& settings);
+	static std::unique_ptr<IMU10DOF> create(const utils::IMUSettings& settings);
 
 	// WARNING: pressure sensor connection test disabled!
 	TestResult testConnection() override;

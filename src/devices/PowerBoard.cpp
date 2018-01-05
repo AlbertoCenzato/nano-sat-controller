@@ -161,8 +161,8 @@ std::string status::StatusDetail() const {
    const string PowerBoard::DEFAULT_DEV_NAME = "Mopi_power_board";
 
 
-PowerBoard::PowerBoard(gnublin_i2c *bus, const utils::PowerBoardSettings& settings)   
-   : DeviceI2C(settings.deviceID, bus, settings.address) {
+PowerBoard::PowerBoard(const utils::PowerBoardSettings& settings)
+   : DeviceI2C(settings.deviceID, settings.address) {
 
    std::tie(maj, minr) = getFirmwareVersion();
 
@@ -335,8 +335,8 @@ TestResult PowerBoard::testConnection() {
    return TestResult(result);
 }
 
-std::unique_ptr<PowerBoard> PowerBoard::create(gnublin_i2c * bus, const utils::PowerBoardSettings & settings) {
-   return std::make_unique<PowerBoard>(bus, settings);
+std::unique_ptr<PowerBoard> PowerBoard::create(const utils::PowerBoardSettings & settings) {
+   return std::make_unique<PowerBoard>(settings);
 }
 
 }  // namespace device

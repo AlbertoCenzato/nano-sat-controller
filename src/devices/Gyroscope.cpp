@@ -113,8 +113,8 @@ const string Gyroscope::DEFAULT_DEV_NAME = "ITG3200_Gyroscope_sensor";
 
 Gyroscope::Gyroscope() : DeviceI2C() { }
 
-Gyroscope::Gyroscope(gnublin_i2c *bus, const utils::GyroscopeSettings& settings) 
-	: DeviceI2C(settings.deviceID, bus, settings.address) {
+Gyroscope::Gyroscope(const utils::GyroscopeSettings& settings)
+	: DeviceI2C(settings.deviceID, settings.address) {
 	
    setGains(settings.gains);
    setOffsets(settings.offsets);
@@ -364,8 +364,8 @@ void Gyroscope::setClockSource(uint8_t _CLKsource) {
 	read8(PWR_MGM, val);
 	write8(PWR_MGM, uint8_t((val & ~PWRMGM_CLK_SEL) | _CLKsource));
 }
-std::unique_ptr<Gyroscope> Gyroscope::create(gnublin_i2c * bus, const utils::GyroscopeSettings & settings) {
-	return std::make_unique<Gyroscope>(bus, settings);
+std::unique_ptr<Gyroscope> Gyroscope::create(const utils::GyroscopeSettings & settings) {
+	return std::make_unique<Gyroscope>(settings);
 }
 #pragma endregion functions
 

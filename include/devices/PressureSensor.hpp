@@ -31,7 +31,7 @@ public:
 	uint16_t md  = 0;  // WARNING originally int, not uint
 
 	PressureSensor();
-	PressureSensor(gnublin_i2c *bus, const utils::PressureSensorSettings& settings);
+	PressureSensor(const utils::PressureSensorSettings& settings);
 	~PressureSensor();
 
 	std::vector<double> read() const override;
@@ -39,7 +39,7 @@ public:
 	long readPressure() const;
 	long readPressureRaw() const;
 
-	static std::unique_ptr<PressureSensor> create(gnublin_i2c *bus, const utils::PressureSensorSettings& settings);
+	static std::unique_ptr<PressureSensor> create(const utils::PressureSensorSettings& settings);
 
 	TestResult testConnection() override;
 

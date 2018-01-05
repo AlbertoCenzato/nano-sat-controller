@@ -51,7 +51,7 @@ public:
 	uint8_t error_code;    // Initial state
 
 	Accelerometer();
-	Accelerometer(gnublin_i2c *bus, const utils::AccelerometerSettigs& settings);
+	Accelerometer(const utils::AccelerometerSettigs& settings);
 
 	/**
 	 *	@brief Generic reading function, overrides ISensor::read()
@@ -199,7 +199,7 @@ public:
       std::cout << "Offsets: " << offsets_ << std::endl;
    }
 
-	static std::unique_ptr<Accelerometer> create(gnublin_i2c *bus, const utils::AccelerometerSettigs& settings);
+	static std::unique_ptr<Accelerometer> create(const utils::AccelerometerSettigs& settings);
 
 protected:
 

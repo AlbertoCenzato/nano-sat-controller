@@ -18,8 +18,6 @@ GNU License V2 for more details: https://www.gnu.org/licenses/gpl-2.0.html
 #include <vector>
 #include <memory>
 
-#include "gnublin-api/gnublin.h"
-
 #include "devices/MotorActuator.hpp"
 #include "devices/FeedbackCoil.hpp"
 #include "devices/CurrentSensor.hpp"
@@ -182,8 +180,6 @@ private:
 			: device(std::move(device)), axis(axis) { }
 	};
 
-
-	gnublin_i2c bus;		// i2c communication bus
 	ctrl::Controller controller;
 
 	vector<AttachedDevice<device::MotorActuator>> motorDesc;

@@ -40,8 +40,8 @@ const string TemperatureSensor::DEFAULT_DEV_NAME = "Adafruit_MCP9808";
 
 TemperatureSensor::TemperatureSensor() : DeviceI2C() { }
 
-TemperatureSensor::TemperatureSensor(gnublin_i2c *bus, const utils::TemperatureSensorSettings& settings)
-	: DeviceI2C(settings.deviceID, bus, settings.address) {
+TemperatureSensor::TemperatureSensor(const utils::TemperatureSensorSettings& settings)
+	: DeviceI2C(settings.deviceID, settings.address) {
 	
 	testsAndActions.emplace_back(std::bind(&TemperatureSensor::testValues, this),
 										  std::bind(&TemperatureSensor::noAction, this));
@@ -89,8 +89,8 @@ int TemperatureSensor::shutdown_wake(uint8_t sw_ID) {
 	return 0;
 }
 
-std::unique_ptr<TemperatureSensor> TemperatureSensor::create(gnublin_i2c * bus, const utils::TemperatureSensorSettings & settings) {
-	return std::make_unique<TemperatureSensor>(bus, settings);
+std::unique_ptr<TemperatureSensor> TemperatureSensor::create(const utils::TemperatureSensorSettings & settings) {
+	return std::make_unique<TemperatureSensor>(settings);
 }
 #pragma endregion functions
 

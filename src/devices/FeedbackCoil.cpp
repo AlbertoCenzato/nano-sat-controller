@@ -22,9 +22,8 @@ namespace device {
 
 FeedbackCoil::FeedbackCoil() : MotorActuator(), feedbackSensor(nullptr) { }
 
-FeedbackCoil::FeedbackCoil(gnublin_i2c *bus, const utils::MotorSettings &settings,
-									const CurrentSensor *feedbackSensor)
-	: MotorActuator(bus, settings), feedbackSensor(feedbackSensor), pid(1/255) { }
+FeedbackCoil::FeedbackCoil(const utils::MotorSettings &settings, const CurrentSensor *feedbackSensor)
+	: MotorActuator(settings), feedbackSensor(feedbackSensor), pid(1/255) { }
 
 
 void FeedbackCoil::act(float target) {
@@ -38,8 +37,8 @@ void FeedbackCoil::act(float target) {
 	}
 }
 
-std::unique_ptr<FeedbackCoil> FeedbackCoil::create(gnublin_i2c * bus, const utils::MotorSettings & settings, const CurrentSensor * feedbackSensor) {
-	return std::make_unique<FeedbackCoil>(bus, settings, feedbackSensor);
+std::unique_ptr<FeedbackCoil> FeedbackCoil::create(const utils::MotorSettings & settings, const CurrentSensor * feedbackSensor) {
+	return std::make_unique<FeedbackCoil>(settings, feedbackSensor);
 }
 
 

@@ -21,20 +21,18 @@ using std::string;
 namespace sat {
 namespace device {
 
-
+// static members initialization
 std::mutex DeviceI2C::busMutex;
+   gnublin_i2c DeviceI2C::bus;
 
 
 // ---------- constructors ----------
 #pragma region constructors
 
-DeviceI2C::DeviceI2C() : Device(), bus(nullptr), address(DEFAULT_I2C_ADDR) { }
+DeviceI2C::DeviceI2C() : Device(), address(DEFAULT_I2C_ADDR), available(false) { }
 
-DeviceI2C::DeviceI2C(const string &name, gnublin_i2c *bus, uint8_t address) 
-	: Device(name), bus(bus), address(address) {
-	
-	//this->bus->setAddress(address);
-}
+DeviceI2C::DeviceI2C(const string &name, uint8_t address)
+	: Device(name), address(address) { }
 
 DeviceI2C::~DeviceI2C() { }
 
@@ -45,7 +43,7 @@ DeviceI2C::~DeviceI2C() { }
 // ---------- public member functions ----------
 #pragma region publ_functions
 
-uint8_t DeviceI2C::getAddress() const {
+uint8_t DeviceI2C::getAddress() const noexcept {
 	return address;
 }
 
@@ -82,9 +80,9 @@ bool DeviceI2C::writeX(uint8_t regAddress, uint8_t* value, int length) {
 
 bool DeviceI2C::write8_const(uint8_t regAddress, uint8_t value) const {
    std::lock_guard<std::mutex> lock(busMutex);
-   bus->setAddress(address);
-   if (bus->send(regAddress, &value, 1) == -1) {
-      Log::err << deviceID << ": " << bus->getErrorMessage();
+   bus.setAddress(address);
+   if (bus.send(regAddress, &value, 1) == -1) {
+      Log::err << deviceID << ": " << bus.getErrorMessage();
       return false;
    }
    return true;
@@ -92,10 +90,10 @@ bool DeviceI2C::write8_const(uint8_t regAddress, uint8_t value) const {
 
 bool DeviceI2C::write16_const(uint8_t regAddress, uint16_t value) const {
    std::lock_guard<std::mutex> lock(busMutex);
-   bus->setAddress(address);
+   bus.setAddress(address);
    uint8_t buff[] = { uint8_t(value >> 8), uint8_t(value & uint16_t(0xFF)) };
-   if (bus->send(regAddress, buff, 2) == -1) {
-      Log::err << deviceID << ": " << bus->getErrorMessage();
+   if (bus.send(regAddress, buff, 2) == -1) {
+      Log::err << deviceID << ": " << bus.getErrorMessage();
       return false;
    }
    return true;
@@ -103,9 +101,9 @@ bool DeviceI2C::write16_const(uint8_t regAddress, uint16_t value) const {
 
 bool DeviceI2C::writeXConst(uint8_t regAddress, uint8_t* value, int length) const {
    std::lock_guard<std::mutex> lock(busMutex);
-   bus->setAddress(address);
-   if (bus->send(regAddress, value, length) == -1) {
-      Log::err << deviceID << ": " << bus->getErrorMessage();
+   bus.setAddress(address);
+   if (bus.send(regAddress, value, length) == -1) {
+      Log::err << deviceID << ": " << bus.getErrorMessage();
       return false;
    }
    return true;
@@ -113,9 +111,9 @@ bool DeviceI2C::writeXConst(uint8_t regAddress, uint8_t* value, int length) cons
 
 bool DeviceI2C::read8(uint8_t regAddress, uint8_t& value) const {
    std::lock_guard<std::mutex> lock(busMutex);
-	bus->setAddress(address);
-	if (bus->receive(regAddress, &value, 1) == -1) {
-		Log::err << deviceID << ": " << bus->getErrorMessage();
+	bus.setAddress(address);
+	if (bus.receive(regAddress, &value, 1) == -1) {
+		Log::err << deviceID << ": " << bus.getErrorMessage();
 		return false;
 	}
 	return true;
@@ -123,10 +121,10 @@ bool DeviceI2C::read8(uint8_t regAddress, uint8_t& value) const {
 
 bool DeviceI2C::read16(uint8_t regAddress, uint16_t& value) const {
    std::lock_guard<std::mutex> lock(busMutex);
-   bus->setAddress(address);
+   bus.setAddress(address);
    uint8_t buff[2];
-   if (bus->receive(regAddress, buff, 2) == -1) {
-      Log::err << deviceID << ": " << bus->getErrorMessage();
+   if (bus.receive(regAddress, buff, 2) == -1) {
+      Log::err << deviceID << ": " << bus.getErrorMessage();
       return false;
    }
 	value = uint16_t(buff[0] << 8);
@@ -136,9 +134,9 @@ bool DeviceI2C::read16(uint8_t regAddress, uint16_t& value) const {
 
 bool DeviceI2C::readX(uint8_t regAddress, uint8_t* value, int length) const {
    std::lock_guard<std::mutex> lock(busMutex);
-	bus->setAddress(address);
-	if (bus->receive(regAddress, value, length) == -1) {
-		Log::err << deviceID << ": " << bus->getErrorMessage();
+	bus.setAddress(address);
+	if (bus.receive(regAddress, value, length) == -1) {
+		Log::err << deviceID << ": " << bus.getErrorMessage();
 		return false;
 	}
 	return true;

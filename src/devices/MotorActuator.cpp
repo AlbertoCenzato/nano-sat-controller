@@ -53,8 +53,8 @@ const string MotorActuator::DEFAULT_DEV_NAME = "Motor_actuator";
 
 MotorActuator::MotorActuator() : DeviceI2C() { }
 
-MotorActuator::MotorActuator(gnublin_i2c *bus, const utils::MotorSettings &settings)
-	: DeviceI2C(settings.deviceID, bus, settings.address) {
+MotorActuator::MotorActuator(const utils::MotorSettings &settings)
+	: DeviceI2C(settings.deviceID, settings.address) {
 
 	//----- PWM constructor -----
 
@@ -155,8 +155,8 @@ void MotorActuator::act(float action) {
 	setSpeed(static_cast<int>(abs(action)));
 }
 
-std::unique_ptr<MotorActuator> MotorActuator::create(gnublin_i2c * bus, const utils::MotorSettings & settings) {
-	return std::make_unique<MotorActuator>(bus, settings);
+std::unique_ptr<MotorActuator> MotorActuator::create(const utils::MotorSettings & settings) {
+	return std::make_unique<MotorActuator>(settings);
 }
 
 

@@ -46,13 +46,13 @@ const string IMU10DOF::DEFAULT_DEV_NAME = "IMU_10_DOF";
 
 IMU10DOF::IMU10DOF() : DeviceI2C() { }
 	
-IMU10DOF::IMU10DOF(gnublin_i2c * bus, const utils::IMUSettings & settings) 
-	: DeviceI2C(settings.deviceID, bus, DEFAULT_I2C_ADDR) {
+IMU10DOF::IMU10DOF(const utils::IMUSettings & settings)
+	: DeviceI2C(settings.deviceID, DEFAULT_I2C_ADDR) {
 
-	accel = Accelerometer(bus, settings.accelerometer);
-	gyros = Gyroscope	   (bus, settings.gyroscope);
-	magne = Magnetometer (bus, settings.magnetometer);
-	press = PressureSensor	   (bus, settings.pressureSensor);
+	accel = Accelerometer (settings.accelerometer);
+	gyros = Gyroscope	    (settings.gyroscope);
+	magne = Magnetometer  (settings.magnetometer);
+	press = PressureSensor(settings.pressureSensor);
 
 	accelRotMat = settings.accelerometer.rotationMat;
 	gyrosRotMat = settings.gyroscope.rotationMat;
@@ -139,8 +139,8 @@ void IMU10DOF::setSensorFusionAlgorithm(unique_ptr<ctrl::IMUSensorFusionAlg>&& a
 	sensorFusionAlg = std::move(algorithm);
 }
 
-std::unique_ptr<IMU10DOF> IMU10DOF::create(gnublin_i2c* bus, const utils::IMUSettings& settings) {
-	return std::make_unique<IMU10DOF>(bus, settings);
+std::unique_ptr<IMU10DOF> IMU10DOF::create(const utils::IMUSettings& settings) {
+	return std::make_unique<IMU10DOF>(settings);
 }
 
 

@@ -106,8 +106,8 @@ Accelerometer::Accelerometer()
    gains_ = { 0.00376390f, 0.00376009f, 0.00349265f };
 }
 
-Accelerometer::Accelerometer(gnublin_i2c *bus, const utils::AccelerometerSettigs& settings) 
-	: DeviceI2C(settings.deviceID, bus, settings.address), status(true), error_code(ADXL345_NO_ERROR) {
+Accelerometer::Accelerometer(const utils::AccelerometerSettigs& settings)
+	: DeviceI2C(settings.deviceID, settings.address), status(true), error_code(ADXL345_NO_ERROR) {
 
 	retrieveSettings(settings);
 
@@ -605,8 +605,8 @@ bool Accelerometer::getRegisterBit(uint8_t regAdress, int bitPos) const {
 	return ((_b >> bitPos) & 1);
 }
 
-std::unique_ptr<Accelerometer> Accelerometer::create(gnublin_i2c * bus, const utils::AccelerometerSettigs & settings) {
-	return std::make_unique<Accelerometer>(bus, settings);
+std::unique_ptr<Accelerometer> Accelerometer::create(const utils::AccelerometerSettigs & settings) {
+	return std::make_unique<Accelerometer>(settings);
 }
 
 

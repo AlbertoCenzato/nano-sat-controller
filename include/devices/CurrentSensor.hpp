@@ -46,7 +46,7 @@ public:
 	static const uint8_t	 DEFAULT_I2C_ADDR = 0x40;    // 1000000 (A0+A1=GND)
 
 	CurrentSensor();
-	CurrentSensor(gnublin_i2c *bus, const utils::CurrentSensorSettings& settings);
+	CurrentSensor(const utils::CurrentSensorSettings& settings);
 
 	/**
 	 *	@brief Generic reading function, overrides ISensor::read()
@@ -92,7 +92,7 @@ public:
 	 */
 	float getShuntVoltage_mV() const;
 
-	static std::unique_ptr<CurrentSensor> create(gnublin_i2c *bus, const utils::CurrentSensorSettings& settings);
+	static std::unique_ptr<CurrentSensor> create(const utils::CurrentSensorSettings& settings);
 
 	TestResult testConnection() override;
 	TestResult testValues() const;
