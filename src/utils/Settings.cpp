@@ -177,7 +177,7 @@ void SensorFusionSettings::load(const Json::Value& value) {
 
 
 void IMUSettings::load(const Json::Value& value) {
-   DeviceI2CSettings::load(value);
+   DeviceSettings::load(value);
 
    accelerometer.load(value["accelerometer"]);
    gyroscope.load(value["gyroscope"]);

@@ -15,6 +15,8 @@ GNU License V2 for more details: https://www.gnu.org/licenses/gpl-2.0.html
 
 #include "devices/DeviceI2C.hpp"
 
+#include <sstream>
+
 using std::string;
 
 
@@ -22,19 +24,19 @@ namespace sat {
 namespace device {
 
 // static members initialization
-std::mutex DeviceI2C::busMutex;
-   gnublin_i2c DeviceI2C::bus;
+std::mutex  DeviceI2C::busMutex;
+gnublin_i2c DeviceI2C::bus;
 
 
 // ---------- constructors ----------
 #pragma region constructors
 
-DeviceI2C::DeviceI2C() : Device(), address(DEFAULT_I2C_ADDR), available(false) { }
+DeviceI2C::DeviceI2C() : address(DEFAULT_I2C_ADDR) {
+   available = false;
+}
 
 DeviceI2C::DeviceI2C(const string &name, uint8_t address)
 	: Device(name), address(address) { }
-
-DeviceI2C::~DeviceI2C() { }
 
 #pragma endregion constructors
 

@@ -21,7 +21,8 @@ GNU License V3 for more details: https://www.gnu.org/licenses/gpl-3.0.html
 
 #include "devices/IMU10DOF.hpp"
 
-#include <math.h>
+#include <iostream>
+#include <cmath>
 #include <thread>
 
 #include "utils/Settings.hpp"
@@ -41,23 +42,22 @@ namespace device {
 
 const string IMU10DOF::DEFAULT_DEV_NAME = "IMU_10_DOF";
 
+// portable way to have greek pi as a constant
+// PI is not in the standard so if a PI constant
+// is defined or not is implementation-dependent
+const double IMU10DOF::PI = 4*atan(1); 
+
 // ---------- Constructors ----------
 #pragma region constructors
 
-IMU10DOF::IMU10DOF() : DeviceI2C() { }
+IMU10DOF::IMU10DOF() : Device(DEFAULT_DEV_NAME), sensorFusionAlg(ctrl::MahoneyFilter::create()) { }
 	
-IMU10DOF::IMU10DOF(const utils::IMUSettings & settings)
-	: DeviceI2C(settings.deviceID, DEFAULT_I2C_ADDR) {
-
-	accel = Accelerometer (settings.accelerometer);
-	gyros = Gyroscope	    (settings.gyroscope);
-	magne = Magnetometer  (settings.magnetometer);
-	press = PressureSensor(settings.pressureSensor);
-
-	accelRotMat = settings.accelerometer.rotationMat;
-	gyrosRotMat = settings.gyroscope.rotationMat;
-	magneRotMat = settings.magnetometer.rotationMat;
-
+IMU10DOF::IMU10DOF(const utils::IMUSettings & s)
+	: Device(s.deviceID), accel(s.accelerometer), gyros(s.gyroscope), 
+     magne(s.magnetometer), press(s.pressureSensor), accelRotMat(s.accelerometer.rotationMat), 
+     gyrosRotMat(s.gyroscope.rotationMat), magneRotMat(s.magnetometer.rotationMat), 
+     sensorFusionAlg(ctrl::MahoneyFilter::create()) 
+{
 	sleep_for(seconds(1));
 
 	// calibrates the gyroscope offsets assuming the device is in a stationary situation
@@ -67,13 +67,7 @@ IMU10DOF::IMU10DOF(const utils::IMUSettings & settings)
 
 	// WARNING: the axis should be Z but here we are applying the rotation matrix!
    auto axis = accelRotMat.t() * utils::Axis::Z;
-	accel.zeroCalibrate(128, milliseconds(5), axis/*utils::Axis::X*/);	// TODO: document this function
-
-   std::cout << "Accelerometer: " << readAccelerometer() << std::endl;
-   std::cout << "Going to sleep..." << std::endl;
-   sleep_for(seconds(10));
-
-	sensorFusionAlg = ctrl::MahoneyFilter::create();
+	accel.zeroCalibrate(128, milliseconds(5), axis);
 }
 
 
@@ -126,8 +120,6 @@ Gyroscope*	    IMU10DOF::getGyroscope()		 { return &gyros; }
 Magnetometer*   IMU10DOF::getMagnetometer()	 { return &magne; }
 PressureSensor* IMU10DOF::getPressureSensor() { return &press; }
 
-
-//void IMU10DOF::startReading() { sensorFusionAlg->resetClock(); }
 
 void IMU10DOF::reset() {
 	sensorFusionAlg->reset();
@@ -192,19 +184,23 @@ Vector10f IMU10DOF::readIMURaw() const {
 	return values;
 }
 
+Vector3f IMU10DOF::getState() {
+	const auto ypr = getYawPitchRoll();
+	return { ypr[2], ypr[1], ypr[0] };
+}
 
 Vector4f IMU10DOF::getQ() {
-	return (*sensorFusionAlg)( {readGyrosope()*(M_PI/180),  // converting to radians/sec
+	return (*sensorFusionAlg)( {readGyrosope()*(PI/180),  // converting to radians/sec
                                readAccelerometer(),
       Vector3f{0.f,0.f,0.f}/*readMagnetometer()*/ });
 }
 
 Vector3f IMU10DOF::getEuler() {
-	auto q = getQ(); // quaternion
+	const auto q = getQ(); // quaternion
 	Vector3f angles;
-	angles[0] =  atan2(2*q[1]*q[2] - 2*q[0]*q[3], 2*q[0]*q[0] + 2*q[1]*q[1] - 1) * 180 / M_PI; // psi
-	angles[1] = -asin (2*q[1]*q[3] + 2*q[0]*q[2]) * 180 / M_PI; // theta
-	angles[2] =  atan2(2*q[2]*q[3] - 2*q[0]*q[1], 2*q[0]*q[0] + 2*q[3]*q[3] - 1) * 180 / M_PI; // phi
+	angles[0] =  atan2(2*q[1]*q[2] - 2*q[0]*q[3], 2*q[0]*q[0] + 2*q[1]*q[1] - 1) * 180 / PI; // psi
+	angles[1] = -asin (2*q[1]*q[3] + 2*q[0]*q[2]) * 180 / PI; // theta
+	angles[2] =  atan2(2*q[2]*q[3] - 2*q[0]*q[1], 2*q[0]*q[0] + 2*q[3]*q[3] - 1) * 180 / PI; // phi
 
 	return angles;
 }
@@ -218,9 +214,9 @@ Vector3f IMU10DOF::getYawPitchRoll() {
 	const auto gz = q[0]*q[0] - q[1]*q[1] - q[2]*q[2] + q[3]*q[3];
 
 	Vector3f ypr;
-	ypr[0] = -atan2(2*q[1]*q[2] - 2*q[0]*q[3], 2*q[0]*q[0] + 2*q[1]*q[1] - 1) * 180 / M_PI; // psi
-	ypr[1] = -atan(gx / sqrt(gy*gy + gz*gz)) * 180 / M_PI;
-	ypr[2] = atan(gy / sqrt(gx*gx + gz*gz)) * 180 / M_PI;
+	ypr[0] = -atan2(2*q[1]*q[2] - 2*q[0]*q[3], 2*q[0]*q[0] + 2*q[1]*q[1] - 1) * 180 / PI; // psi
+	ypr[1] = -atan(gx / sqrt(gy*gy + gz*gz)) * 180 / PI;
+	ypr[2] = atan(gy / sqrt(gx*gx + gz*gz)) * 180 / PI;
 
 	return ypr;
 }
@@ -257,13 +253,6 @@ TestResult IMU10DOF::testConnection() {
 
 	return result;
 }
-
-
-Vector3f IMU10DOF::getState() {
-	const auto ypr = getYawPitchRoll();
-	return { ypr[2], ypr[1], ypr[0] };
-}
-
 
 #pragma endregion inherited_functions
 

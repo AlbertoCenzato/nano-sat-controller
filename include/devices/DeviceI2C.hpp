@@ -58,7 +58,7 @@ public:
 	 */
 	DeviceI2C(const std::string &name, uint8_t address);
 
-	virtual ~DeviceI2C();
+	virtual ~DeviceI2C() = default;
 
 	/**
 	 *	@brief Gets the 8-bit I2C address of the device

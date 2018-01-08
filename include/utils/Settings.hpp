@@ -150,7 +150,7 @@ struct SensorFusionSettings : SettingsBase {
 /**
  *	@brief Settings class for IMU10DOF
  */
-struct IMUSettings : DeviceI2CSettings {
+struct IMUSettings : DeviceSettings {
 	AccelerometerSettigs   accelerometer;
 	GyroscopeSettings		  gyroscope;
 	MagnetometerSettings	  magnetometer;
