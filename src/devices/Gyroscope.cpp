@@ -103,19 +103,20 @@ using sat::utils::Vector3i;
 using sat::utils::Vector3f;
 
 namespace sat {
-namespace device
-{
+namespace device {
 
-const string Gyroscope::DEFAULT_DEV_NAME = "ITG3200_Gyroscope_sensor";
+const string Gyroscope::DEFAULT_DEV_ID = "ITG3200_Gyroscope_sensor";
 
 // ---------- Constructors ----------
 #pragma region constructors
 
-Gyroscope::Gyroscope() : DeviceI2C() { }
+std::unique_ptr<Gyroscope> Gyroscope::create(const utils::GyroscopeSettings & settings) {
+	return std::make_unique<Gyroscope>(settings);
+}
 
-Gyroscope::Gyroscope(const utils::GyroscopeSettings& settings)
-	: DeviceI2C(settings.deviceID, settings.address) {
-	
+Gyroscope::Gyroscope() : DeviceI2C(DEFAULT_DEV_ID, DEFAULT_I2C_ADDR) { }
+
+Gyroscope::Gyroscope(const utils::GyroscopeSettings& settings) : DeviceI2C(settings.deviceID, settings.address) {
    setGains(settings.gains);
    setOffsets(settings.offsets);
 
@@ -363,9 +364,6 @@ void Gyroscope::setClockSource(uint8_t _CLKsource) {
 	uint8_t val;
 	read8(PWR_MGM, val);
 	write8(PWR_MGM, uint8_t((val & ~PWRMGM_CLK_SEL) | _CLKsource));
-}
-std::unique_ptr<Gyroscope> Gyroscope::create(const utils::GyroscopeSettings & settings) {
-	return std::make_unique<Gyroscope>(settings);
 }
 #pragma endregion functions
 

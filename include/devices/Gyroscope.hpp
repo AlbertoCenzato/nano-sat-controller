@@ -29,17 +29,16 @@ namespace sat {
 
 namespace utils { struct GyroscopeSettings; }
 
-namespace device
-{
+namespace device {
 
 /**
- *	@brief Gyro values are expressed in deg/sec
+ *	@brief Calss for ITG-3200 gyroscope.
  */
 class Gyroscope : public DeviceI2C, public ISensor {
 
 public:
 
-	static const std::string DEFAULT_DEV_NAME;
+	static const std::string DEFAULT_DEV_ID;
 	static const uint8_t		 DEFAULT_I2C_ADDR = 0x68;
 
 	// "The LSB bit of the 7 bit address is determined by the logic level on pin 9. 
@@ -50,10 +49,87 @@ public:
 	static const uint8_t ITG3200_ADDR_AD0_LOW  = 0x68; //AD0=0 0x68 I2C address when AD0 is connected to LOW (GND)
 	static const uint8_t ITG3200_ADDR_AD0_HIGH = 0x69; //AD0=1 0x69 I2C address when AD0 is connected to HIGH (VCC) - default for sparkfun breakout
 
-	//utils::Vector3f polarities;
 
+   /**
+    * @brief best way to instantiate a Gyroscope object
+    * 
+    * Static function that returns a managed pointer to a Gyroscope object.
+    * See this class' constructors for futher details.
+    */
+   static std::unique_ptr<Gyroscope> create(const utils::GyroscopeSettings& settings);
+
+   /**
+    * @brief default constructor
+    */
 	Gyroscope();
+
+   /**
+    * @brief class constructor
+    */
 	Gyroscope(const utils::GyroscopeSettings& settings);
+
+   
+   /**
+	 *	@brief Reads the angular rate (deg/s) of the device
+	 */
+	std::vector<double> read() const override;
+
+   /**
+    * @brief Reads the angular rate (deg/s) of the device
+    */
+	utils::Vector3f readGyro() const; // includes gain and offset
+
+   /**
+	 *	@brief Reading function, does not apply gains and offsets
+	 *	@return Raw readings for X, Y, Z axis in this order
+	 */
+	utils::Vector3f readGyroRaw() const;
+
+   /**
+	 *	@brief Tests if the device is connected
+	 */
+   TestResult testConnection() override;
+   
+   /**
+    * @retrun offsets by which each measure is translated 
+    *         before being multiplyied by the gains
+    */
+   utils::Vector3f getOffsets() const;
+
+   /**
+    * @return gains applyied to every measurement
+    */
+   utils::Vector3f getGains() const;
+
+   /**
+    * @param offsets
+    */
+   void setOffsets(const utils::Vector3f& offsets);
+
+   /**
+    * @param gains
+    */
+	void setGains(const utils::Vector3f& gains);
+
+   /**
+    * @brief calibrates offests to have 0 deg/s on every axis when gyro is not moving
+    * 
+    * @param totSamples number of measures to do
+    * @param sampleDelay waiting time between two measures
+    * 
+    * @note do not move the gyroscope during calibration 
+    */
+   template<typename _Rep, typename _Period>
+	void zeroCalibrate(int totSamples, std::chrono::duration<_Rep,_Period> sampleDelay) {
+      utils::Vector3f tmpOffsets{ 0.f,0.f,0.f };
+      for (auto i = 0; i < totSamples; i++) {
+         this_thread::sleep_for(sampleDelay);
+         tmpOffsets += readGyroRaw();
+      }
+
+      setOffsets(tmpOffsets / float(totSamples));
+   }
+	
 
 	// Who Am I
 	void setDevAddr(unsigned int _addr);
@@ -99,31 +175,6 @@ public:
 	// Gyro Sensors
 	void readTemp(float *_Temp) const;
 	
-   utils::Vector3f getOffsets() const;
-   utils::Vector3f getGains() const;
-
-   void setOffsets(const utils::Vector3f& offsets);
-	void setGains(const utils::Vector3f& gains);
-
-   // assuming gyroscope is stationary (updates XYZ offsets for zero)
-   template<typename _Rep, typename _Period>
-	void zeroCalibrate(int totSamples, std::chrono::duration<_Rep,_Period> sampleDelay) {
-      utils::Vector3f tmpOffsets{ 0.f,0.f,0.f };
-      for (auto i = 0; i < totSamples; i++) {
-         this_thread::sleep_for(sampleDelay);
-         tmpOffsets += readGyroRaw();
-      }
-
-      setOffsets(tmpOffsets / float(totSamples));
-   }
-	
-	/**
-	 *	@brief Reads the angular rate (�/s) of the device
-	 */
-	std::vector<double> read() const override;
-	utils::Vector3f readGyro() const; // includes gain and offset
-	utils::Vector3f readGyroRaw() const;
-	
 	// Power management
 	void reset(); // after reset all registers have default values
 	bool isLowPower() const;
@@ -136,10 +187,6 @@ public:
 	void setZgyroStandby(bool _Status);
 	uint8_t getClockSource() const;
 	void setClockSource(uint8_t _CLKsource); // see register parameters above
-
-	static std::unique_ptr<Gyroscope> create(const utils::GyroscopeSettings& settings);
-
-	TestResult testConnection() override;
 
 protected:
    utils::Vector3f gains_;
