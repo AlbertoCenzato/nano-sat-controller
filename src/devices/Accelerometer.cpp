@@ -29,26 +29,26 @@ GNU License V2 for more details: https://www.gnu.org/licenses/gpl-2.0.html
 #define ADXL345_DEVID			 0x00
 #define ADXL345_RESERVED1		 0x01
 #define ADXL345_THRESH_TAP		 0x1d
-#define ADXL345_OFSX			 0x1e
-#define ADXL345_OFSY			 0x1f
-#define ADXL345_OFSZ			 0x20
+#define ADXL345_OFSX			    0x1e
+#define ADXL345_OFSY			    0x1f
+#define ADXL345_OFSZ			    0x20
 #define ADXL345_DUR				 0x21
 #define ADXL345_LATENT			 0x22
 #define ADXL345_WINDOW			 0x23
 #define ADXL345_THRESH_ACT		 0x24
 #define ADXL345_THRESH_INACT	 0x25
 #define ADXL345_TIME_INACT		 0x26
-#define ADXL345_ACT_INACT_CTL    0x27
+#define ADXL345_ACT_INACT_CTL  0x27
 #define ADXL345_THRESH_FF		 0x28
 #define ADXL345_TIME_FF			 0x29
 #define ADXL345_TAP_AXES		 0x2a
-#define ADXL345_ACT_TAP_STATUS	 0x2b
+#define ADXL345_ACT_TAP_STATUS 0x2b
 #define ADXL345_BW_RATE			 0x2c
 #define ADXL345_POWER_CTL		 0x2d
 #define ADXL345_INT_ENABLE		 0x2e
 #define ADXL345_INT_MAP			 0x2f
 #define ADXL345_INT_SOURCE		 0x30
-#define ADXL345_DATA_FORMAT		 0x31
+#define ADXL345_DATA_FORMAT	 0x31
 #define ADXL345_DATAX0			 0x32
 #define ADXL345_DATAX1			 0x33
 #define ADXL345_DATAY0			 0x34
@@ -56,7 +56,7 @@ GNU License V2 for more details: https://www.gnu.org/licenses/gpl-2.0.html
 #define ADXL345_DATAZ0			 0x36
 #define ADXL345_DATAZ1			 0x37
 #define ADXL345_FIFO_CTL		 0x38
-#define ADXL345_FIFO_STATUS		 0x39
+#define ADXL345_FIFO_STATUS	 0x39
 #define ADXL345_BW_1600			 0xF // 1111
 #define ADXL345_BW_800			 0xE // 1110
 #define ADXL345_BW_400			 0xD // 1101  
@@ -65,8 +65,8 @@ GNU License V2 for more details: https://www.gnu.org/licenses/gpl-2.0.html
 #define ADXL345_BW_50			 0xA // 1010 
 #define ADXL345_BW_25			 0x9 // 1001 
 #define ADXL345_BW_12			 0x8 // 1000 
-#define ADXL345_BW_6			 0x7 // 0111
-#define ADXL345_BW_3			 0x6 // 0110
+#define ADXL345_BW_6			    0x7 // 0111
+#define ADXL345_BW_3			    0x6 // 0110
 #pragma endregion registers
 
 // Interrupt PINs - INT1: 0, INT2: 1
@@ -95,31 +95,30 @@ using sat::utils::Vector3i;
 using sat::utils::Vector3f;
 
 namespace sat {
-namespace device
-{
+namespace device {
 
-const string Accelerometer::DEFAULT_DEV_NAME = "ADXL345_Accelerometer";
+const string Accelerometer::DEFAULT_DEV_ID = "ADXL345_Accelerometer";
 
-Accelerometer::Accelerometer() 
-	: DeviceI2C(), status(true), error_code(ADXL345_NO_ERROR) {
-	
-   gains_ = { 0.00376390f, 0.00376009f, 0.00349265f };
+
+std::unique_ptr<Accelerometer> Accelerometer::create(const utils::AccelerometerSettigs & settings) {
+	return std::make_unique<Accelerometer>(settings);
 }
+
+
+
+Accelerometer::Accelerometer() : DeviceI2C(DEFAULT_DEV_ID, DEFAULT_I2C_ADDR), 
+   status(true), error_code(ADXL345_NO_ERROR), gains_{0.00376390f, 0.00376009f, 0.00349265f} { }
 
 Accelerometer::Accelerometer(const utils::AccelerometerSettigs& settings)
 	: DeviceI2C(settings.deviceID, settings.address), status(true), error_code(ADXL345_NO_ERROR) {
 
-	retrieveSettings(settings);
+	setOffsets(settings.offsets);
+   setGains(settings.gains);
 
 	setRangeSetting(2);
    Accelerometer::write8(ADXL345_POWER_CTL, 8); // power on
 }
 
-
-void Accelerometer::retrieveSettings(const utils::AccelerometerSettigs &settings) {
-   offsets_ = settings.offsets;
-   setGains(settings.gains);
-}
 
 vector<double> Accelerometer::read() const {
 	auto val = readAccel();
@@ -147,6 +146,39 @@ Vector3f Accelerometer::readAccelRaw() const {
 	return Vector3f { float(int16_t((buffer[1] << 8) | buffer[0])),
 					      float(int16_t((buffer[3] << 8) | buffer[2])),
 					      float(int16_t((buffer[5] << 8) | buffer[4])) };
+}
+
+
+TestResult Accelerometer::testConnection() {
+	auto test = ConnectionSelfTest::create(deviceID);
+	uint8_t value;
+	if (!read8(ADXL345_DEVID, value)) {
+		test->errorLevel = ErrorLevel::warning;
+		test->additionalInfo += " | Read error!";
+		return TestResult(test);
+	}
+	if (value != 0b11100101)
+		test->errorLevel = ErrorLevel::warning;
+	
+	return TestResult(test);
+}
+
+
+Vector3f Accelerometer::getOffsets() const {
+   return offsets_;
+}
+
+Vector3f Accelerometer::getGains() const {
+   return gains_;
+}
+
+void Accelerometer::setOffsets(const Vector3f& offsets) {
+   offsets_ = offsets;
+}
+
+// set/get the gain for each axis in Gs / count
+void Accelerometer::setGains(const Vector3f& gains) {
+	gains_ = gains;
 }
 
 
@@ -261,23 +293,6 @@ int Accelerometer::getTapThreshold() const {
 	uint8_t _b;
 	readX(ADXL345_THRESH_TAP, &_b, 1);
 	return int(_b);
-}
-
-Vector3f Accelerometer::getOffsets() const {
-   return offsets_;
-}
-
-Vector3f Accelerometer::getGains() const {
-   return gains_;
-}
-
-void Accelerometer::setOffsets(const Vector3f& offsets) {
-   offsets_ = offsets;
-}
-
-// set/get the gain for each axis in Gs / count
-void Accelerometer::setGains(const Vector3f& gains) {
-	gains_ = gains;
 }
 
 
@@ -605,29 +620,6 @@ bool Accelerometer::getRegisterBit(uint8_t regAdress, int bitPos) const {
 	return ((_b >> bitPos) & 1);
 }
 
-std::unique_ptr<Accelerometer> Accelerometer::create(const utils::AccelerometerSettigs & settings) {
-	return std::make_unique<Accelerometer>(settings);
-}
-
-
-// ---------- Inherited functions ----------
-#pragma region inherited_functions
-
-TestResult Accelerometer::testConnection() {
-	auto test = ConnectionSelfTest::create(deviceID);
-	uint8_t value;
-	if (!read8(ADXL345_DEVID, value)) {
-		test->errorLevel = ErrorLevel::warning;
-		test->additionalInfo += " | Read error!";
-		return TestResult(test);
-	}
-	if (value != 0b11100101)
-		test->errorLevel = ErrorLevel::warning;
-	
-	return TestResult(test);
-}
-
-#pragma endregion inherited_functions
 
 } // namespace device
 } // namespace sat

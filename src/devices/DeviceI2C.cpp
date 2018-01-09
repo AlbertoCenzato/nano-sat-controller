@@ -24,6 +24,7 @@ namespace sat {
 namespace device {
 
 // static members initialization
+const std::string DeviceI2C::DEFAULT_DEV_ID = "Generic_I2C_device";
 std::mutex  DeviceI2C::busMutex;
 gnublin_i2c DeviceI2C::bus;
 
@@ -31,7 +32,7 @@ gnublin_i2c DeviceI2C::bus;
 // ---------- constructors ----------
 #pragma region constructors
 
-DeviceI2C::DeviceI2C() : address(DEFAULT_I2C_ADDR) {
+DeviceI2C::DeviceI2C() : Device(DEFAULT_DEV_ID), address(DEFAULT_I2C_ADDR) {
    available = false;
 }
 

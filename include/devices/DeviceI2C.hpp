@@ -42,6 +42,7 @@ class DeviceI2C : public Device {
 
 public:
 
+   static const std::string DEFAULT_DEV_ID;
 	static const uint8_t		 DEFAULT_I2C_ADDR = 0x00;
 
 	/**

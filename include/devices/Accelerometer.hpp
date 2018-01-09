@@ -24,7 +24,6 @@ GNU License V2 for more details: https://www.gnu.org/licenses/gpl-2.0.html
 #include "devices/Interfaces.hpp"
 
 #include "utils/DataTypes.hpp"
-#include "Accelerometer.hpp"
 
 namespace sat {
 
@@ -41,7 +40,7 @@ class Accelerometer : public DeviceI2C, public ISensor {
 
 public:
 
-	static const std::string DEFAULT_DEV_NAME;
+	static const std::string DEFAULT_DEV_ID;
 	static const uint8_t	 DEFAULT_I2C_ADDR = 0x1D;
 
 	static const uint8_t ADXL345_ADDR_ALT_HIGH = 0x1D; // Accelerometer address when ALT is connected to HIGH
@@ -50,7 +49,22 @@ public:
 	bool	  status;        // set when error occurs see error code for details
 	uint8_t error_code;    // Initial state
 
-	Accelerometer();
+	/**
+    * @brief best way to instantiate an Accelerometer object
+    * 
+    * Static function that returns a managed pointer to an Accelerometer object.
+    * See this class' constructors for futher details.
+    */
+   static std::unique_ptr<Accelerometer> create(const utils::AccelerometerSettigs& settings);
+   
+   /**
+	 * @brief default constructor
+	 */
+   Accelerometer();
+
+   /**
+    * @brief class constructor
+    */
 	Accelerometer(const utils::AccelerometerSettigs& settings);
 
 	/**
@@ -66,7 +80,7 @@ public:
 	utils::Vector3f readAccel() const;
 
 	/**
-	 *	@brief Reading function
+	 *	@brief Reading function, does not apply gains and offsets
 	 *	@return Raw readings for X, Y, Z axis in this order
 	 */
 	utils::Vector3f readAccelRaw() const;
@@ -76,14 +90,54 @@ public:
 	 */
 	TestResult testConnection() override;
 
-	void setTapThreshold(int tapThreshold);
-	int  getTapThreshold() const;
-
+   /**
+    * @retrun offsets by which each measure is translated 
+    *         before being multiplyied by the gains
+    */
    utils::Vector3f getOffsets() const;
+
+   /**
+    * @return gains applyied to every measurement
+    */
    utils::Vector3f getGains() const;
 
+   /**
+    * @param offsets 
+    */
    void setOffsets(const utils::Vector3f& offsets);
+
+   /**
+    * @param gains
+    */
 	void setGains(const utils::Vector3f& gains);
+
+   /**
+    * @brief calibrates offests to have 1000 milli-g on verticalAxis and 0 milli-g on the others
+    * 
+    * @param totSamples number of measures to do
+    * @param sampleDelay waiting time between two measures
+    * @param verticalAxis axis where you expect a 1000 milli-g measure
+    * 
+    * @note do not move the accelerometer during calibration 
+    */
+   template<typename _Rep, typename _Period>
+   void zeroCalibrate(int totSamples, std::chrono::duration<_Rep,_Period> sampleDelay, utils::Axis verticalAxis) {
+      
+      utils::Vector3f tmp{ 0.f, 0.f, 0.f };
+      for (auto i = 0; i < totSamples; i++) {
+         tmp += readAccelRaw();
+         this_thread::sleep_for(sampleDelay);
+      }
+
+      tmp = tmp / float(totSamples);
+      tmp[int(verticalAxis)] -= 1000.f/gains_[int(verticalAxis)];
+
+      offsets_ = tmp;
+   }
+
+
+	void setTapThreshold(int tapThreshold);
+	int  getTapThreshold() const;
 
 	/**
 	* @brief Sets the OFSX, OFSY and OFSZ bytes
@@ -91,8 +145,6 @@ public:
 	*		  a scale factor of 15,6mg/LSB
 	*		  OFSX, OFSY and OFSZ should be comprised between
 	*/
-	//void setOffsets(const utils::Vector<std::uint8_t, 3>& offsets);
-   //utils::Vector3i getOffsets() const;
 
 	void setTapDuration(int tapDuration);
 	int  getTapDuration() const;
@@ -183,37 +235,15 @@ public:
 	bool getJustifyBit() const;
 	void setJustifyBit(bool justifyBit);
 
-   template<typename _Rep, typename _Period>
-   void zeroCalibrate(int totSamples, std::chrono::duration<_Rep,_Period> sampleDelay, utils::Axis verticalAxis) {
-      
-      utils::Vector3f tmp{ 0.f, 0.f, 0.f };
-      for (auto i = 0; i < totSamples; i++) {
-         tmp += readAccelRaw();
-         this_thread::sleep_for(sampleDelay);
-      }
-
-      tmp = tmp / float(totSamples);
-      tmp[int(verticalAxis)] -= 1000.f/gains_[int(verticalAxis)];
-
-      offsets_ = tmp;
-      std::cout << "Offsets: " << offsets_ << std::endl;
-   }
-
-	static std::unique_ptr<Accelerometer> create(const utils::AccelerometerSettigs& settings);
-
 protected:
 
    utils::Vector3f gains_;  // counts to Gs
    utils::Vector3f offsets_;
 
-	void retrieveSettings(const utils::AccelerometerSettigs& settings);
-
 	void setRegisterBit(uint8_t regAdress, int bitPos, bool state);
 	bool getRegisterBit(uint8_t regAdress, int bitPos) const;
 	
 };
-
-//void print_byte(uint8_t val);
 
 using AccelerometerSensorPtr = std::unique_ptr<Accelerometer>;
 
