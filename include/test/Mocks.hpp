@@ -40,8 +40,8 @@ public:
    explicit MotorActuatorMock(NanoSatDynamicsMock *dynamicsMock, utils::Axis axis);
 
    TestResult selfTest() noexcept override;
-   bool isAvailable() const override;
-   std::string getID() const override;
+   bool isAvailable() const noexcept override;
+   std::string getID() const noexcept override;
    std::string toString() const override;
    void act(float action) override;
 
@@ -59,8 +59,8 @@ public:
    explicit IMUMock(NanoSatDynamicsMock *dynamicsMock);
 
    TestResult selfTest() noexcept override;
-   bool isAvailable() const override;
-   std::string getID() const override;
+   bool isAvailable() const noexcept override;
+   std::string getID() const noexcept override;
    std::string toString() const override;
    std::vector<double> read() const override;
    utils::Vector<float, 3> getState() override;

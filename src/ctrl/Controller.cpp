@@ -234,7 +234,7 @@ bool Controller::checkIfValid(const Operation& op) const {
 }
 
 
-void setMaxSchedulingPriority() {
+void setMaxSchedulingPriority() throw(sat::utils::scheduling_error) {
    // schedule this thread as real-time program with max priority
    const auto this_pthread = pthread_self();
 

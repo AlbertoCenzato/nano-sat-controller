@@ -61,9 +61,9 @@ MotorActuatorMock::MotorActuatorMock(NanoSatDynamicsMock* dynamicsMock, utils::A
 
 TestResult MotorActuatorMock::selfTest() noexcept { return TestResult(); }
 
-bool MotorActuatorMock::isAvailable() const { return true; }
+bool MotorActuatorMock::isAvailable() const noexcept { return true; }
 
-std::string MotorActuatorMock::getID() const { return "MotorActuatorMock"; }
+std::string MotorActuatorMock::getID() const noexcept { return "MotorActuatorMock"; }
 
 std::string MotorActuatorMock::toString() const { return "MotorActuatorMock"; }
 
@@ -81,9 +81,9 @@ IMUMock::IMUMock(NanoSatDynamicsMock* dynamicsMock) : nanoSatDynamics_(dynamicsM
 
 TestResult IMUMock::selfTest() noexcept { return TestResult(); }
 
-bool IMUMock::isAvailable() const { return true; }
+bool IMUMock::isAvailable() const noexcept { return true; }
 
-std::string IMUMock::getID() const { return "IMUMock"; }
+std::string IMUMock::getID() const noexcept { return "IMUMock"; }
 
 std::string IMUMock::toString() const { return "IMUMock"; }
 

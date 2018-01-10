@@ -118,9 +118,9 @@ CurrentSensor::CurrentSensor(const utils::CurrentSensorSettings& settings)
    : DeviceI2C(settings.deviceID, settings.address), ina219_calValue(0), 
      ina219_currentDivider_mA(0), ina219_powerDivider_mW(0) 
 {
-   addTestAndAction(&CurrentSensor::testValues, &CurrentSensor::noAction);
-	//testsAndActions.emplace_back(std::bind(&CurrentSensor::testValues, this),
-	//									  std::bind(&CurrentSensor::noAction, this));
+   //addTestAndAction(&CurrentSensor::testValues, &CurrentSensor::noAction);
+	testsAndActions.emplace_back(std::bind(&CurrentSensor::testValues, this),
+										  std::bind(&CurrentSensor::noAction, this));
 	setCalibration_32V_2A();
 }
 
