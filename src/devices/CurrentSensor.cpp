@@ -101,22 +101,26 @@ namespace sat {
 namespace device
 {
 
-const string CurrentSensor::DEFAULT_DEV_NAME = "Adafruit_INA219";
+const string CurrentSensor::DEFAULT_DEV_ID = "Adafruit_INA219";
 const chrono::seconds CurrentSensor::DEVICE_RESET_TIME = chrono::seconds(1);
 
 // ---------- Constructors ----------
 #pragma region constructors
 
-CurrentSensor::CurrentSensor() : DeviceI2C() { }
-CurrentSensor::CurrentSensor(const utils::CurrentSensorSettings& settings)
-	: DeviceI2C(settings.deviceID, settings.address) {
+std::unique_ptr<CurrentSensor> CurrentSensor::create(const utils::CurrentSensorSettings& settings) {
+	return std::make_unique<CurrentSensor>(settings);
+}
 
-	// TODO: use addTestAndAction()
-	//addTestAndAction(testValues, noAction);
-	testsAndActions.emplace_back(std::bind(&CurrentSensor::testValues, this),
-										  std::bind(&CurrentSensor::noAction, this));
-	ina219_currentDivider_mA = 0;
-	ina219_powerDivider_mW = 0;
+CurrentSensor::CurrentSensor() : DeviceI2C(DEFAULT_DEV_ID, DEFAULT_I2C_ADDR), ina219_calValue(0), 
+     ina219_currentDivider_mA(0), ina219_powerDivider_mW(0) { }
+
+CurrentSensor::CurrentSensor(const utils::CurrentSensorSettings& settings) 
+   : DeviceI2C(settings.deviceID, settings.address), ina219_calValue(0), 
+     ina219_currentDivider_mA(0), ina219_powerDivider_mW(0) 
+{
+   addTestAndAction(&CurrentSensor::testValues, &CurrentSensor::noAction);
+	//testsAndActions.emplace_back(std::bind(&CurrentSensor::testValues, this),
+	//									  std::bind(&CurrentSensor::noAction, this));
 	setCalibration_32V_2A();
 }
 
@@ -125,11 +129,28 @@ CurrentSensor::CurrentSensor(const utils::CurrentSensorSettings& settings)
 // ---------- public member functions ------------------
 #pragma region pub_functions
 
-vector<double> CurrentSensor::read() const {
+float CurrentSensor::readCurrent() const {
+	if (!available)
+		return std::numeric_limits<float>::quiet_NaN();
 
-	vector<double> val(1);
-	val[0] = readCurrent();
-	return val;
+	uint16_t value;
+
+	// Sometimes a sharp load will reset the INA219, which will
+	// reset the cal register, meaning CURRENT and POWER will
+	// not be available ... avoid this by always setting a cal
+	// value even if it's an unfortunate extra step
+	write16_const(INA219_REG_CALIBRATION, ina219_calValue);
+
+	// Now we can safely read the CURRENT register!
+	read16(INA219_REG_CURRENT, value);
+
+	float valueDec = int16_t(value);
+	valueDec /= float(ina219_currentDivider_mA);
+	return valueDec;
+}
+
+vector<double> CurrentSensor::read() const {
+	return { double(readCurrent()) };
 }
 
 
@@ -392,12 +413,8 @@ float CurrentSensor::getShuntVoltage_mV() const {
 	return int16_t(value_raw) * 0.01f;
 }
 
-std::unique_ptr<CurrentSensor> CurrentSensor::create(const utils::CurrentSensorSettings& settings) {
-	return std::make_unique<CurrentSensor>(settings);
-}
 
-
-	float CurrentSensor::getBusVoltage_V() const {
+float CurrentSensor::getBusVoltage_V() const {
 	uint16_t value_raw;
 	read16(INA219_REG_BUSVOLTAGE, value_raw);
 
@@ -406,27 +423,6 @@ std::unique_ptr<CurrentSensor> CurrentSensor::create(const utils::CurrentSensorS
 	return value * 0.001f;
 }
 
-
-float CurrentSensor::readCurrent() const {
-
-	if (!available)
-		return std::numeric_limits<float>::quiet_NaN();
-
-	uint16_t value;
-
-	// Sometimes a sharp load will reset the INA219, which will
-	// reset the cal register, meaning CURRENT and POWER will
-	// not be available ... avoid this by always setting a cal
-	// value even if it's an unfortunate extra step
-	write16_const(INA219_REG_CALIBRATION, ina219_calValue);
-
-	// Now we can safely read the CURRENT register!
-	read16(INA219_REG_CURRENT, value);
-
-	float valueDec = int16_t(value);
-	valueDec /= float(ina219_currentDivider_mA);
-	return valueDec;
-}
 #pragma endregion pub_functions
 
 
@@ -437,17 +433,17 @@ float CurrentSensor::readCurrent() const {
 
 bool CurrentSensor::read16(uint8_t regAddress, uint16_t& value) const {
 
-	bus->setAddress(address);
-	if (bus->send(regAddress) == -1) {
-		Log::err << deviceID + ": " + bus->getErrorMessage();
+	bus.setAddress(address);
+	if (bus.send(regAddress) == -1) {
+		Log::err << deviceID + ": " + bus.getErrorMessage();
 		return false;
 	}
 
 	sleep_for(chrono::microseconds(600));
 
 	uint8_t readBuff[2];
-	if (bus->receive(readBuff, 2) == -1) {
-		Log::err << deviceID + ": " + bus->getErrorMessage();
+	if (bus.receive(readBuff, 2) == -1) {
+		Log::err << deviceID + ": " + bus.getErrorMessage();
 		return false;
 	}
 

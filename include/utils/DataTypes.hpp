@@ -63,5 +63,13 @@ using Vector10f = Vector<float, 10>;
 
 using LogLevel = spdlog::level::level_enum;
 
+// portable way to have greek pi as a constant
+// PI is not in the standard so if a PI constant
+// is defined or not is implementation-dependent
+const double PI = 3.1415926535897932384626433832795;
+
 } // namespace utils
+
+using utils::PI;
+
 } // namespace sat

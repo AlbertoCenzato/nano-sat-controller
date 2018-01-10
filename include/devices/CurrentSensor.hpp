@@ -42,10 +42,25 @@ namespace device {
 class CurrentSensor : public DeviceI2C, public ISensor {
 public:
 
-	static const std::string DEFAULT_DEV_NAME;
+	static const std::string DEFAULT_DEV_ID;
 	static const uint8_t	 DEFAULT_I2C_ADDR = 0x40;    // 1000000 (A0+A1=GND)
 
+   /**
+    * @brief best way to instantiate a CurrentSensor object
+    * 
+    * Static function that returns a managed pointer to a CurrentSensor object.
+    * See this class' constructors for futher details.
+    */
+   static std::unique_ptr<CurrentSensor> create(const utils::CurrentSensorSettings& settings);
+
+   /**
+    * @brief default constructor
+    */
 	CurrentSensor();
+
+   /**
+    * @brief class constructor
+    */
 	CurrentSensor(const utils::CurrentSensorSettings& settings);
 
 	/**
@@ -92,9 +107,14 @@ public:
 	 */
 	float getShuntVoltage_mV() const;
 
-	static std::unique_ptr<CurrentSensor> create(const utils::CurrentSensorSettings& settings);
-
+   /**
+	 *	@brief Tests if the device is connected
+	 */
 	TestResult testConnection() override;
+
+   /**
+    * @brief Tests if current values are between -2000 and +2000 mA
+    */
 	TestResult testValues() const;
 
 private:

@@ -42,11 +42,6 @@ namespace device {
 
 const string IMU10DOF::DEFAULT_DEV_NAME = "IMU_10_DOF";
 
-// portable way to have greek pi as a constant
-// PI is not in the standard so if a PI constant
-// is defined or not is implementation-dependent
-const double IMU10DOF::PI = 4*atan(1); 
-
 // ---------- Constructors ----------
 #pragma region constructors
 

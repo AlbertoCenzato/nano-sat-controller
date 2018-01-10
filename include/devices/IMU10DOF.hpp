@@ -53,7 +53,6 @@ class IMU10DOF : public Device, public IIMU {
 public:
 
 	static const std::string DEFAULT_DEV_NAME;
-   static const double PI;
 
 
    /**

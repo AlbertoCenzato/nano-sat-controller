@@ -29,22 +29,28 @@ namespace utils { struct AlignmentSensorSettings; }
 	
 namespace device {
 
-
 /**
  * @brief This class provides a measure of the satellite offset
- *		  wrt a fixed target. It uses the RPi camera to estimate
- *		  the alignment.
+ *		    wrt a fixed target. It uses the RPi camera to estimate
+ *		    the alignment.
  *		 
- * @note All AlignmentSensor object share a unique pointer to 
- *		 the static camera capture object used for reading camera frames.
- *		 Be careful if you modify the static object!
- * @note Of course this class is not thread-safe
+ * @note All AlignmentSensor objects share a unique pointer to 
+ *		   the static camera capture object used for reading camera frames.
+ *		   Be careful if you modify the static object!
+ * @note This class is not thread-safe
  */
+
+// -----------------------------------------------------
+// ------- WARNING: this class is not complete ---------
+// -----------------------------------------------------
+
 class AlignmentSensor : public Device, public ISensor {
 
 public:
 	explicit AlignmentSensor(const utils::AlignmentSensorSettings& settings);
 	virtual ~AlignmentSensor();
+
+   // TODO: add copy constructor and copy-assignment
 
 	std::vector<double> read() const override;
 

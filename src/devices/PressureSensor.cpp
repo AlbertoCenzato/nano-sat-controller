@@ -1,3 +1,13 @@
+/*===========================================================================
+                           Nano satellite controller
+
+// Copyright: Copyright (c) 2017, Alberto Cenzato
+              All rights reserved.
+
+// Licence: MIT
+
+//===========================================================================*/
+
 #include "devices/PressureSensor.hpp"
 
 #include <thread>
@@ -28,11 +38,11 @@ using this_thread::sleep_for;
 namespace sat {
 namespace device {
 
-const string PressureSensor::DEFAULT_DEV_NAME = "BMP085_pressure_sensor";
+const string PressureSensor::DEFAULT_DEV_ID = "BMP085_pressure_sensor";
 
 // ---------- Constructors ----------
 #pragma region constructors
-PressureSensor::PressureSensor() : DeviceI2C() { }
+PressureSensor::PressureSensor() : DeviceI2C(DEFAULT_DEV_ID, DEFAULT_I2C_ADDR) { }
 
 PressureSensor::PressureSensor(const utils::PressureSensorSettings& settings)
 	: DeviceI2C(settings.deviceID, settings.address) {
@@ -49,8 +59,6 @@ PressureSensor::PressureSensor(const utils::PressureSensorSettings& settings)
 	read16(MC_REGISTER,  mc);
 	read16(MD_REGISTER,  md);
 }
-
-PressureSensor::~PressureSensor() { }
 
 #pragma endregion constructors
 
@@ -94,7 +102,7 @@ long PressureSensor::get_temperature(unsigned int ut) const {
 
 
 long PressureSensor::get_pressure(unsigned long up) const {
-	auto _b5 = get_temperature(readUT());
+	const auto _b5 = get_temperature(readUT());
 	long p;
 
 	auto b6 = _b5 - 4000;

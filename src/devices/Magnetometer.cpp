@@ -48,18 +48,21 @@ using sat::utils::Vector3f;
 namespace sat {
 namespace device {
 
-const string Magnetometer::DEFAULT_DEV_NAME = "HMC5883L_3Axis_Magnetometer";
+const string Magnetometer::DEFAULT_DEV_ID = "HMC5883L_3Axis_Magnetometer";
 
 // ---------- Constructors ----------
 #pragma region cunstructors
 
-Magnetometer::Magnetometer() : DeviceI2C() { }
+std::unique_ptr<Magnetometer> Magnetometer::create(const utils::MagnetometerSettings & settings) {
+	return std::make_unique<Magnetometer>(settings);
+}
 
-Magnetometer::Magnetometer(const utils::MagnetometerSettings& settings)
-	: DeviceI2C(settings.deviceID, settings.address), offsets_(settings.offsets), gains_(settings.gains) {
+Magnetometer::Magnetometer() : DeviceI2C(DEFAULT_DEV_ID, DEFAULT_I2C_ADDR) { }
 
+Magnetometer::Magnetometer(const utils::MagnetometerSettings& settings)	: DeviceI2C(settings.deviceID, settings.address) {
+   setOffsets(settings.offsets);
+   setGains(settings.gains);
 	setMeasurementMode(Measurement_Continuous);
-   //setGains(settings.gains);
 }
 
 #pragma endregion cunstructors
@@ -155,12 +158,6 @@ void Magnetometer::setGains(const Vector3f& gains) {
 
 	return true;
    */
-}
-
-
-
-std::unique_ptr<Magnetometer> Magnetometer::create(const utils::MagnetometerSettings & settings) {
-	return std::make_unique<Magnetometer>(settings);
 }
 
 int Magnetometer::setMeasurementMode(uint8_t mode) {
