@@ -7,8 +7,9 @@ namespace config {
 
 inline int getVersionMajor() { return @NANOSAT_VERSION_MAJOR@; }
 inline int getVersionMinor() { return @NANOSAT_VERSION_MINOR@; }
+inline int getVersionPatch() { return @NANOSAT_VERSION_PATCH@; }
 inline std::string getInstallDirectory()   { return "@NANOSAT_INSTALL_DIR@";   }
-inline std::string getVersion() { return std::to_string(getVersionMajor()) + "." + std::to_string(getVersionMinor()); }
+inline std::string getVersion() { return std::string("@NANOSAT_VERSION_MAJOR@") + "." + "@NANOSAT_VERSION_MINOR@" + "." + "@NANOSAT_VERSION_PATCH@"; }
 
 } // namespace config
 } // namespace sat

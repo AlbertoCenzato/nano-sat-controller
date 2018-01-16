@@ -26,9 +26,9 @@ int main()
 		OSSignalHandler::registerSignalHandlers();
 	   
 		// print startup message
-		cout << "---------------------------------" << endl;
+		cout << "-----------------------------------" << endl;
 		cout << "| Nano Satellite Controller v" << sat::config::getVersion() << " |" << endl;
-		cout << "---------------------------------\n\n" << endl;
+		cout << "-----------------------------------\n\n" << endl;
 
 		// load configuration file
       cout << "Loading configuration file..." << endl;
@@ -138,7 +138,6 @@ void runTests(const sat::NanoSat& nanoSat) {
 										"test gyroscope offsets",
 										"test camera",
 										"test motor-axes assignment",
-		                        "test controller (offline)",
 		                        "gyroscope-imu comparison",
 		                        "test imu tracking",
 		                        "test power board",
@@ -158,11 +157,10 @@ void runTests(const sat::NanoSat& nanoSat) {
 		case 11: test.gyroscopeOffsets();      break;
 		case 12: test.camera();			         break;
 		case 13: test.motorAxes();		         break;
-      case 14: test.testController();        break;
-      case 16: test.testGyroscopeImuError(); break;
-      case 17: test.testIMUTracking();       break;
-      case 18: test.powerBoard();            break;
-      case 19: break;
+      case 14: test.testGyroscopeImuError(); break;
+      case 15: test.testIMUTracking();       break;
+      case 16: test.powerBoard();            break;
+      case 17: break;
 		default: break;
 		}
 

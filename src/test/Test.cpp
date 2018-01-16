@@ -381,30 +381,6 @@ void Test::motorAxes() const {
 	}
 }
 
-void Test::testController() const {
-
-   auto motor = satellite_->getDCMotor(Axis::Y);
-   
-   utils::ControllerSettings settings;
-   settings.kp = 0.2;
-   ctrl::Controller controller(settings);
-
-   utils::Vector3f startingState{ 0.f, 0.f, 179.f };
-   NanoSatDynamicsMock dynamics(startingState);
-   IMUMock imu(&dynamics);
-   MotorActuatorMock motorX(&dynamics, Axis::X);
-   MotorActuatorMock motorY(&dynamics, Axis::Y);
-   MotorActuatorMock motorZ(&dynamics, Axis::Z);
-
-   ctrl::Operation op;
-   op.actuatorX = &motorX;
-   op.actuatorY = &motorY;
-   op.actuatorZ = &motorZ;
-   op.imu = &imu;
-   op.finalState = { 0.f, 0.f, 0.f };
-
-   controller.addOperation(op).run();
-}
 
 void Test::testGyroscopeImuError() const {
    

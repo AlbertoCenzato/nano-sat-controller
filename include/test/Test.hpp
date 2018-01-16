@@ -56,7 +56,6 @@ public:
 	void availability() const;
 	void readSpeed() const;
 	void motorAxes() const;
-   void testController() const;
    void testGyroscopeImuError() const;
    void testIMUTracking() const;
    void powerBoard() const;
