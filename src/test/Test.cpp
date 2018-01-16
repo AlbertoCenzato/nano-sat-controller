@@ -29,7 +29,6 @@ GNU License V2 for more details: https://www.gnu.org/licenses/gpl-2.0.html
 #include "utils/UI.hpp"
 #include "utils/Settings.hpp"
 #include "ctrl/Controller.hpp"
-#include "test/Mocks.hpp"
 
 using std::this_thread::sleep_for;
 
