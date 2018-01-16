@@ -69,7 +69,7 @@ struct PID : ControlAlgorithm<T> {
 		integral += (lastError + error)*dt / 2;	// numerically integrating using trapezioidal rule
 		auto p = kp*error;
 		auto i = ki*integral;
-		auto d = kd*(error - lastError);
+		auto d = kd*(error - lastError); // kd*(speed)  la lettura della velocità deve essere mediata su 5 valori
 		lastError = error;
 		lastT = now;
 
