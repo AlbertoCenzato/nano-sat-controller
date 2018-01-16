@@ -50,7 +50,7 @@ public:
 
 
 
-class IMUMock : public device::IIMU {
+class IMUMock {
 
    NanoSatDynamicsMock *nanoSatDynamics_;
 
@@ -58,12 +58,12 @@ public:
 
    explicit IMUMock(NanoSatDynamicsMock *dynamicsMock);
 
-   TestResult selfTest() noexcept override;
-   bool isAvailable() const noexcept override;
-   std::string getID() const noexcept override;
-   std::string toString() const override;
-   std::vector<double> read() const override;
-   utils::Vector<float, 3> getState() override;
+   TestResult selfTest() noexcept;
+   bool isAvailable() const noexcept;
+   std::string getID() const noexcept;
+   std::string toString() const;
+   std::vector<double> read() const;
+   utils::Vector<float, 3> getState();
    //void startReading() override;
 };
    

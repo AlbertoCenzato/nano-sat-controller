@@ -49,7 +49,7 @@ namespace device {
  * in order to have all of them in the same reference frame. All their measurements (pressure
  * excluded) are fused using a sensor fusion algorithm to enhance precision
  */
-class IMU10DOF : public Device, public IIMU {
+class IMU10DOF : public Device, public ISensor {
 public:
 
 	static const std::string DEFAULT_DEV_NAME;
@@ -111,7 +111,7 @@ public:
     * 
     * @return (X,Y,Z) angles in degrees
     */
-	utils::Vector3f getState() override;
+	utils::Vector3f getState();
 
    /**
     * @brief Updates the state filter and gives the state in quaternions.

@@ -22,8 +22,8 @@ set(OpenCV_LIBS opencv_core opencv_video opencv_videoio opencv_highgui opencv_im
 
 ## add configuration file
 set (NANOSAT_INSTALL_DIR ${CMAKE_INSTALL_PREFIX})
-set (NANOSAT_VERSION_MAJOR 0)
-set (NANOSAT_VERSION_MINOR 5)
+set (NANOSAT_VERSION_MAJOR 1)
+set (NANOSAT_VERSION_MINOR 0)
 configure_file (config.h.in ${CMAKE_SOURCE_DIR}/include/config.h )
 
 ###########

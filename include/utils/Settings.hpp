@@ -19,6 +19,7 @@ GNU License V3 for more details: https://www.gnu.org/licenses/gpl-3.0.html
 
 #include <string>
 #include <vector>
+#include <chrono>
 
 #include "jsoncpp/json-forwards.h"
 #include "utils/DataTypes.hpp"
@@ -240,12 +241,15 @@ struct AlignmentSensorSettings : DeviceSettings {
 struct ControllerSettings : SettingsBase {
 	
 	float tolerance = 1.f;
-   float kp = 10.f / 255;
-   float ki = 0.f;
-   float kd = 0.f;
+   float kp = 10.f / 255;  // PID proportional gain
+   float ki = 0.f;         // PID integral gain
+   float kd = 0.f;         // PID derivative gain
 
-	ControllerSettings() = default;
-	explicit ControllerSettings(const Json::Value& value) {
+   uint32_t measurementsPerControl = 10;
+   std::chrono::milliseconds ctrlLoopTimeout; 
+
+	ControllerSettings() : ctrlLoopTimeout(20000) { }
+	explicit ControllerSettings(const Json::Value& value) : ctrlLoopTimeout(20000) {
       ControllerSettings::load(value);
 	}
 

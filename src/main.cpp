@@ -51,10 +51,10 @@ int main()
          ui::clearConsole();	// clear screen
 
 			// let the user choose operating mode
-			int mode = ui::selectFromList({"run standard mode",
-										          "run tests",
-										          "calibrate",
-			                               "exit"});
+			const auto mode = ui::selectFromList({ "run standard mode",
+										                  "run tests",
+										                  "calibrate",
+			                                       "exit"});
 			// run in the selected mode
 			switch (mode) {
 			case 2:	runTests(satellite); break;
@@ -96,12 +96,19 @@ void executeMainProgram(sat::NanoSat &satellite) {
    std::cout << "Move the nano satellite to desired initial position." << std::endl;
    sat::trackMotionUntilKeyPress(satellite, "Press enter when in position.");
 
-	if (satellite.performHoming())
+   sat::ctrl::Operation op;
+   op.actuatorX = satellite.getDCMotor(Axis::X);
+   op.actuatorY = satellite.getDCMotor(Axis::Y);
+   op.actuatorZ = satellite.getDCMotor(Axis::Z);
+   op.imu       = satellite.getIMU();
+   op.finalState = { 0.f, 0.f, 20.f };
+
+	if (satellite.move(op))
 		std::cout << "Home reached!" << std::endl;
 	else
 		std::cout << "Couldn't reach target!" << std::endl;
 
-	// do some maneuvers here
+	// do some operations here
 
 }
 
@@ -134,7 +141,8 @@ void runTests(const sat::NanoSat& nanoSat) {
 		                        "test controller (offline)",
 		                        "gyroscope-imu comparison",
 		                        "test imu tracking",
-		                        "test power board"});
+		                        "test power board",
+		                        "back"});
 
 		switch (mode) {
 		case  1: test.imu10DOF();		         break;
@@ -154,6 +162,7 @@ void runTests(const sat::NanoSat& nanoSat) {
       case 16: test.testGyroscopeImuError(); break;
       case 17: test.testIMUTracking();       break;
       case 18: test.powerBoard();            break;
+      case 19: break;
 		default: break;
 		}
 
@@ -167,16 +176,18 @@ void calibrate(sat::NanoSat &nanoSat) {
    test::Calibration calib(&nanoSat);
    std::string header("-------- CALIBRATION MODE ---------\n");
 
-   bool exit = false;
+   auto exit = false;
    while (!exit) {
       ui::clearConsole();
       cout << header << endl;
 
-      auto selection = ui::selectFromList({ "Calibrate gyroscope gains",
-                                       "Calibrate magnetometer offsets" });
+      const auto selection = ui::selectFromList({ "Calibrate gyroscope gains",
+                                                  "Calibrate magnetometer offsets",
+                                                  "Back"});
       switch (selection) {
       case 1: calib.calibrateGyroscopeGains();        break;
       case 2: calib.calibrateMagnetometerOffsets();   break;
+      case 3: break;
       default: break;
       }
 

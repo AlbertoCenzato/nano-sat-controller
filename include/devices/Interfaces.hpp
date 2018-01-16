@@ -106,22 +106,39 @@ public:
 };
 
 
-
 /**
  *	@brief This class represents an abstract IMU with an undefined number
  *			 of degrees of freedom. Probabily useless.
  */
-class IIMU : public ISensor {
-public:
-
-	IIMU() = default;
-	virtual ~IIMU() = default;
-
-	/**
-	 * @biref Gives the rotation around X, Y and Z axis
-	 */
-	virtual utils::Vector<float,3> getState() = 0;
-};
+//class IIMU : public ISensor {
+//public:
+//
+//	IIMU() = default;
+//	virtual ~IIMU() = default;
+//
+//	/**
+//	 * @biref Gives the rotation around X, Y and Z axis
+//	 */
+//	virtual utils::Vector<float,3> getState() = 0;
+//
+//   /**
+//    * @brief Returns a non-owning pointer to the accelerometer 
+//    *        contained in the imu
+//    */
+//   virtual ISensor* getAccelerometer() const noexcept = 0;
+//
+//   /**
+//    * @brief Returns a non-owning pointer to the gyroscope 
+//    *        contained in the imu
+//    */
+//   virtual ISensor* getGyroscope() const noexcept = 0;
+//
+//   /**
+//    * @brief Returns a non-owning pointer to the gyroscope 
+//    *        contained in the imu
+//    */
+//   virtual ISensor* getMagnetometer() const noexcept = 0;
+//};
 
 
 

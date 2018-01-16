@@ -65,8 +65,8 @@ std::string Operation::toString() const noexcept {
 // ----------------------- Controller ---------------------------
 // --------------------------------------------------------------
 
-Controller::Controller(const utils::ControllerSettings& settings) 
-	: tolerance(settings.tolerance), opList(0), controlThreadReturnVal(false) {
+Controller::Controller(const utils::ControllerSettings& settings) : tolerance(settings.tolerance), opList(0), controlThreadReturnVal(false), 
+     MEASUREMENTS_PER_CONTROL(settings.measurementsPerControl), CTRL_LOOP_TIMEOUT(settings.ctrlLoopTimeout) {
 
 	controlFunction = PID<Vector3f>::create(settings.kp, settings.ki, settings.kd);
 }
@@ -145,14 +145,20 @@ void Controller::run_() {
 			auto actuatorX = op.actuatorX;
 			auto actuatorY = op.actuatorY;
 			auto actuatorZ = op.actuatorZ;
-			auto state = imu->getState();
+			
+		   auto state = imu->getState();
+         auto velocity = imu->readGyrosope();
+
 			Vector3f lastControlOutput{0.f,0.f,0.f};
 
          // execute control loop
-			while (/*!equalsWithTolerance(state, finalState, tolerance)*/true) {
+         auto exitControlLoop   = false;
+         auto finalStateReached = false;
+         auto reachingTime = chrono::high_resolution_clock::now();
+			while (!exitControlLoop) {
 
 				// compute feedback control
-            const auto controlOutput = (*controlFunction)(state, finalState) + lastControlOutput;
+            const auto controlOutput = (*controlFunction)(state, velocity, finalState) + lastControlOutput;
 
 				std::cout << "State: " << state << ";   Control output: " << controlOutput << std::endl;
 
@@ -162,11 +168,22 @@ void Controller::run_() {
 				
 				lastControlOutput = controlOutput;
 
-            state = { 0.f,0.f,0.f };
-            for (auto i = 0; i < MEASUREMENTS_PER_CONTROL; ++i) {
-               state += imu->getState();
+            state    = { 0.f, 0.f, 0.f };
+            velocity = { 0.f, 0.f, 0.f };
+            for (uint32_t i = 0; i < MEASUREMENTS_PER_CONTROL; ++i) {
+               state    += imu->getState();
+               velocity += imu->readGyrosope();
             }
-            state = state / MEASUREMENTS_PER_CONTROL;
+            state    = state    / MEASUREMENTS_PER_CONTROL;
+            velocity = velocity / MEASUREMENTS_PER_CONTROL;
+
+            if (equalsWithTolerance(state, finalState, tolerance) && !finalStateReached) {
+               reachingTime = chrono::high_resolution_clock::now();
+               finalStateReached = true;
+            }
+
+            if (finalStateReached && (reachingTime + CTRL_LOOP_TIMEOUT) < chrono::high_resolution_clock::now())
+               exitControlLoop = true;
 
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
 			}

@@ -27,18 +27,16 @@ GNU License V3 for more details: https://www.gnu.org/licenses/gpl-3.0.html
 #include "utils/Exceptions.hpp"
 #include "utils/Logger.hpp"
 #include "utils/Settings.hpp"
+#include "devices/IMU10DOF.hpp"
 
 
 namespace sat {
 
-namespace device {
-	class IActuator;
-	class IIMU;
-}
+namespace device { class IActuator; }
 
 
 using device::IActuator;
-using device::IIMU;
+using device::IMU10DOF;
 
 namespace ctrl {
 
@@ -57,7 +55,7 @@ struct Operation {
 	IActuator *actuatorX;
 	IActuator *actuatorY;
    IActuator *actuatorZ;
-	IIMU *imu;
+	IMU10DOF *imu;
 
 	utils::Vector3f finalState;
 
@@ -118,7 +116,8 @@ private:
 	std::vector<Operation> opList;
 	bool controlThreadReturnVal;
 	std::unique_ptr<ControlAlgorithm<utils::Vector3f>> controlFunction;
-   const int MEASUREMENTS_PER_CONTROL = 10;
+   const uint32_t MEASUREMENTS_PER_CONTROL;
+   const std::chrono::milliseconds CTRL_LOOP_TIMEOUT;
 
    /**
     * @brief private version of run(), it executes the control loop

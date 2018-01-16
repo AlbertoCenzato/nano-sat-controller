@@ -229,6 +229,14 @@ void ControllerSettings::load(const Json::Value& value) {
       ki = Ki.asFloat();
    if (!Kd.isNull())
       kd = Kd.asFloat();
+
+   auto& measPerControl = value["measurementsPerControl"];
+   if (!measPerControl.isNull())
+      measurementsPerControl = measPerControl.asUInt();
+
+   auto& controlLoopTimeout = value["ctrlLoopTimeout"];
+   if (!controlLoopTimeout.isNull())
+      ctrlLoopTimeout = std::chrono::milliseconds(controlLoopTimeout.asUInt());
 }
 
 #pragma endregion derived_settings
