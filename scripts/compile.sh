@@ -7,7 +7,7 @@ cd build
 cmake -DCMAKE_BUILD_TYPE=Debug -D CMAKE_INSTALL_PREFIX=$install_dir .. && \
 make #-j3
 
-mkdir $install_dir
+mkdir -p $install_dir
 cp NanoSatController.exe $install_dir/NanoSatController.exe
 cp -r ../resources $install_dir
 echo "NanoSatController installed in $install_dir"
