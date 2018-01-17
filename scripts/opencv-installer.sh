@@ -1,9 +1,10 @@
 #!/bin/bash
 
-#if [$# = 0]
-#	echo "Please specify install dir"
-#	exit 0
-#fi
+if [$# = 0]
+then
+	echo "Please specify install dir"
+	exit 0
+fi
 
 install_prefix=$1
 opencv_folder="opencv-3.3"
