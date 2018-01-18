@@ -27,16 +27,12 @@ cd $opencv_folder && \
 git clone https://github.com/opencv/opencv.git && \
 echo "OpenCV download completed!" && \
 
-echo "Downloading OpenCV extra-modules..." && \
-git clone https://github.com/opencv/opencv_contrib.git && \
-echo "OpenCV extra-modules download completed!!" && \
-
 # Build OpenCV release
 echo "Building OpenCV (release)..." && \
 mkdir Release && \
 cd Release && \
 # TODO: enable options to speedup opencv
-cmake -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_INSTALL_PREFIX=$install_prefix -D OPENCV_EXTRA_MODULES_PATH=../opencv_contrib/modules -DWITH_V4L=ON -DWITH_LIBV4L=ON -DBUILD_PERF_TESTS=OFF -DBUILD_TESTS=OFF ../opencv && \
+cmake -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_INSTALL_PREFIX=$install_prefix -DWITH_V4L=ON -DWITH_LIBV4L=ON -DBUILD_PERF_TESTS=OFF -DBUILD_TESTS=OFF ../opencv && \
 make -j3 && \
 echo "Finished OpenCV (release) build!" && \
 
