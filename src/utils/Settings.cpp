@@ -223,12 +223,21 @@ void ControllerSettings::load(const Json::Value& value) {
 	auto& Kp = value["kp"];
    auto& Ki = value["ki"];
    auto& Kd = value["kd"];
-	if (!Kp.isNull())
-		kp = Kp.asFloat();
-   if (!Ki.isNull())
-      ki = Ki.asFloat();
-   if (!Kd.isNull())
-      kd = Kd.asFloat();
+	if (!Kp.isNull() && Kp.isArray()) {
+      const auto size = Kp.size();
+      for (size_t i = 0; i < 3 && i < size; ++i)
+		   kp[i] = Kp[i].asFloat();
+   }
+   if (!Ki.isNull() && Ki.isArray()) {
+      const auto size = Ki.size();
+      for (size_t i = 0; i < 3 && i < size; ++i)
+         ki[i] = Ki.get(i,0.f).asFloat();
+   }
+   if (!Kd.isNull() && Kd.isArray()) {
+      const auto size = Ki.size();
+      for (size_t i = 0; i < 3 && i < size; ++i)
+         kd[i] = Kd[i].asFloat();
+   }
 
    auto& measPerControl = value["measurementsPerControl"];
    if (!measPerControl.isNull())

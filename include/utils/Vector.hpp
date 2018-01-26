@@ -20,6 +20,7 @@ GNU License V3 for more details: https://www.gnu.org/licenses/gpl-3.0.html
 #include <array>
 #include <iterator>
 #include <cmath>
+#include <type_traits>
 
 namespace sat {
 namespace utils {
@@ -77,7 +78,7 @@ public:
 
 	constexpr Vector(const container &init) : values(init) { }
 
-	virtual ~Vector() { }
+	virtual ~Vector() = default;
 
 
 	constexpr value_type& operator[](std::size_t idx) {
@@ -89,14 +90,14 @@ public:
 	}
 
 	Vector<value_type, size>& operator+=(const Vector<value_type, size>& lhs) {
-		for (auto i = 0; i < size; ++i)
+		for (size_t i = 0; i < size; ++i)
 			values[i] += lhs[i];
 
 		return *this;
 	}
 
 	Vector<value_type, size>& operator-=(const Vector<value_type, size>& lhs) {
-		for (auto i = 0; i < size; ++i)
+		for (size_t i = 0; i < size; ++i)
 			values[i] -= lhs[i];
 
 		return *this;
@@ -209,6 +210,20 @@ Vector<T, dim> operator/(const Vector<T, dim>& s, float coeff) {
 	Vector<T, dim> resul;
 	for (auto i = 0; i < dim; ++i) resul[i] = s[i] / coeff;
 	return resul;
+}
+
+
+template<typename T, typename = std::enable_if_t<std::is_arithmetic<T>::value>>
+T multElementwise(T v1, T v2) {
+   return v1 * v2;
+}
+
+template<typename T, int dim>
+Vector<T, dim> multElementwise(const Vector<T, dim>& v1, const Vector<T, dim>& v2) {
+   Vector<T, dim> result;
+   for (size_t i = 0; i < dim; ++i) 
+      result[i] = multElementwise(v1[i],v2[i]);
+   return result;
 }
 
 /**

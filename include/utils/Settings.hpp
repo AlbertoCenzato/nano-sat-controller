@@ -240,10 +240,10 @@ struct AlignmentSensorSettings : DeviceSettings {
  */
 struct ControllerSettings : SettingsBase {
 	
-	float tolerance = 1.f;
-   float kp = 10.f / 255;  // PID proportional gain
-   float ki = 0.f;         // PID integral gain
-   float kd = 0.f;         // PID derivative gain
+	float tolerance = 1.5f;
+   Vector3f kp = {10.f / 255, 10.f / 255, 10.f / 255};  // PID proportional gain
+   Vector3f ki;         // PID integral gain
+   Vector3f kd;         // PID derivative gain
 
    uint32_t measurementsPerControl = 10;
    std::chrono::milliseconds ctrlLoopTimeout; 

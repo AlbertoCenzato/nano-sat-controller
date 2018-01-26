@@ -23,7 +23,7 @@ namespace device {
 FeedbackCoil::FeedbackCoil() : MotorActuator(), feedbackSensor(nullptr) { }
 
 FeedbackCoil::FeedbackCoil(const utils::MotorSettings &settings, const CurrentSensor *feedbackSensor)
-	: MotorActuator(settings), feedbackSensor(feedbackSensor), pid(1/255) { }
+   : MotorActuator(settings), feedbackSensor(feedbackSensor), pid(1/255) { }
 
 
 void FeedbackCoil::act(float target) {

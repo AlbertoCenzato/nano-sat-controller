@@ -56,21 +56,23 @@ struct ControlAlgorithm {
 template<typename T>
 struct PID : ControlAlgorithm<T> {
 
-	float kp, ki, kd; // proportional, integral and derivative gains
+	T kp, ki, kd; // proportional, integral and derivative gains
 	std::chrono::time_point<std::chrono::system_clock> lastT;
 	T lastError;
 	T integral;
 
-	explicit PID(float kp = 0, float ki = 0, float kd = 0) : kp(kp), ki(ki), kd(kd) { }
+   explicit PID(T kp = T(), T ki = T(), T kd = T()) : kp(kp), ki(ki), kd(kd) { }
 
 	T operator()(T state, T stateDerivative, T target) override {
       auto error = state - target;
 		auto now = std::chrono::high_resolution_clock::now();
 		auto dt = std::chrono::duration_cast<std::chrono::nanoseconds>(now - lastT).count();
 		integral += (lastError + error)*dt / 2;	// numerically integrating using trapezioidal rule
-		auto p = kp*error;
-		auto i = ki*integral;
-		auto d = kd*(stateDerivative); // kd*(speed)
+      
+		auto p = utils::multElementwise(kp, error);
+      auto i = utils::multElementwise(ki, integral);
+		auto d = utils::multElementwise(kd, stateDerivative); // kd*(speed)
+		
 		lastError = error;
 		lastT = now;
 
@@ -82,16 +84,18 @@ struct PID : ControlAlgorithm<T> {
 		auto now = std::chrono::high_resolution_clock::now();
 		auto dt = std::chrono::duration_cast<std::chrono::nanoseconds>(now - lastT).count();
 		integral += (lastError + error)*dt / 2;	// numerically integrating using trapezioidal rule
-		auto p = kp*error;
-		auto i = ki*integral;
-		auto d = kd*(error - lastError);
+		
+      auto p = utils::multElementwise(kp, error);
+      auto i = utils::multElementwise(ki, integral);
+		auto d = utils::multElementwise(kd, error - lastError);
+
 		lastError = error;
 		lastT = now;
 
 		return p + i + d;
 	}
 
-	static std::unique_ptr<PID<T>> create(float kp = 0, float ki = 0, float kd = 0) {
+	static std::unique_ptr<PID<T>> create(T kp, T ki, T kd) {
 		return std::make_unique<PID<T>>(kp, ki, kd);
 	}
 };
