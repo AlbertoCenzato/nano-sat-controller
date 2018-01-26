@@ -243,6 +243,7 @@ void trackMotionUntilKeyPress(const NanoSat& satellite, std::string message) {
    while (!stop) {
       const auto state = imu->getState();
       utils::ui::clearConsole();
+      std::cout << message << std::endl;
       std::cout << "(X, Y, Z): " << state << std::endl;
       this_thread::sleep_for(chrono::milliseconds(100));
    }

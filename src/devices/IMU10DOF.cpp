@@ -55,14 +55,8 @@ IMU10DOF::IMU10DOF(const utils::IMUSettings & s)
 {
 	sleep_for(seconds(1));
 
-	// calibrates the gyroscope offsets assuming the device is in a stationary situation
-	// it takes 128 samples (readings) from the gyroscope, one every 5ms and takes the average
-	// as offset value
-	gyros.zeroCalibrate(128, milliseconds(5));
-
-	// WARNING: the axis should be Z but here we are applying the rotation matrix!
-   auto axis = accelRotMat.t() * utils::Axis::Z;
-	accel.zeroCalibrate(128, milliseconds(5), axis);
+	// calibrates the gyroscope and accelerometer offsets assuming the device is in a stationary situation
+	reset();
 }
 
 
@@ -119,7 +113,7 @@ PressureSensor* IMU10DOF::getPressureSensor() { return &press; }
 void IMU10DOF::reset() {
 	sensorFusionAlg->reset();
    gyros.zeroCalibrate(128, milliseconds(5));
-   accel.zeroCalibrate(128, milliseconds(5), accelRotMat*utils::Axis::Z);
+   accel.zeroCalibrate(128, milliseconds(5), accelRotMat.t()*utils::Axis::Z);
 }
 
 void IMU10DOF::setSensorFusionAlgorithm(unique_ptr<ctrl::IMUSensorFusionAlg>&& algorithm) {

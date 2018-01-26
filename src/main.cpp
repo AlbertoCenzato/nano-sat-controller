@@ -16,7 +16,7 @@ using namespace sat::utils;
 
 void runTests(const sat::NanoSat& nanoSat);
 void calibrate(sat::NanoSat& nanoSat);
-void executeMainProgram(sat::NanoSat& satellite);
+void executeMainProgram(sat::NanoSat& satellite, const Vector3f &target);
 
 
 int main()
@@ -60,7 +60,7 @@ int main()
 			case 2:	runTests(satellite); break;
 			case 3:	calibrate(satellite); break;
          case 4:  break;
-			default: executeMainProgram(satellite);
+			default: executeMainProgram(satellite, settings.global.target);
 			}
 			
          exit = ui::yesNoAnswer("Exit program?");
@@ -81,7 +81,7 @@ int main()
 }
 
 
-void executeMainProgram(sat::NanoSat &satellite) {
+void executeMainProgram(sat::NanoSat &satellite, const Vector3f &target) {
 	// ----- perform startup tests -----
    Log::info << "Performing tests for all attached devices...";
    auto result = satellite.selfTest();
@@ -93,18 +93,22 @@ void executeMainProgram(sat::NanoSat &satellite) {
 		Log::info << "Tests passed!";
 	}
 
-   std::cout << "Move the nano satellite to desired initial position." << std::endl;
-   sat::trackMotionUntilKeyPress(satellite, "Press enter when in position.");
+   std::cout << "Re-calibrating IMU... hold the nano sat in (0,0,0)... " << std::endl;
+   satellite.getIMU()->reset();
+   std::cout << "Done!" << std::endl;
+
+   sat::trackMotionUntilKeyPress(satellite, 
+      "Move the nano satellite to desired initial position. Press [ENTER] when in position.");
 
    sat::ctrl::Operation op;
    op.actuatorX = satellite.getDCMotor(Axis::X);
    op.actuatorY = satellite.getDCMotor(Axis::Y);
    op.actuatorZ = satellite.getDCMotor(Axis::Z);
    op.imu       = satellite.getIMU();
-   op.finalState = { 0.f, 0.f, 20.f };
+   op.finalState = target;
 
 	if (satellite.move(op))
-		std::cout << "Home reached!" << std::endl;
+		std::cout << "Target reached!" << std::endl;
 	else
 		std::cout << "Couldn't reach target!" << std::endl;
 

@@ -293,6 +293,7 @@ struct GlobalSettings : SettingsBase {
 
 	std::string logFilePath;
    LogLevel logLevel;
+   Vector3f target;
 
 	GlobalSettings() = default;
 	explicit GlobalSettings(const Json::Value& value) {

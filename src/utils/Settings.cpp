@@ -310,6 +310,16 @@ void GlobalSettings::load(const Json::Value& value) {
          break;
       }
    }
+
+   auto trgt = value["target"];
+   if (!trgt.isNull() && trgt.isArray()) {
+      const auto size = trgt.size();
+      for (size_t i = 0; i < 3 && i < size; ++i)
+         target[i] = trgt[i].asFloat();
+   }
+   else {
+      target = {0.f, 0.f, 45.f};
+   }
 }
 
 

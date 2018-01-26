@@ -213,16 +213,41 @@ Vector<T, dim> operator/(const Vector<T, dim>& s, float coeff) {
 }
 
 
+/**
+ * @brief multiplies two arithmetic scalars
+ */
 template<typename T, typename = std::enable_if_t<std::is_arithmetic<T>::value>>
 T multElementwise(T v1, T v2) {
    return v1 * v2;
 }
 
+/**
+ * @brief multiplies two utils::Vector (or utils::Matrix) element wise
+ */
 template<typename T, int dim>
 Vector<T, dim> multElementwise(const Vector<T, dim>& v1, const Vector<T, dim>& v2) {
    Vector<T, dim> result;
    for (size_t i = 0; i < dim; ++i) 
       result[i] = multElementwise(v1[i],v2[i]);
+   return result;
+}
+
+/**
+ * @brief divides two arithmetic scalars
+ */
+template<typename T, typename = std::enable_if_t<std::is_arithmetic<T>::value>>
+T divElementwise(T v1, T v2) {
+   return v1 / v2;
+}
+
+/**
+ * @brief divides two utils::Vector (or utils::Matrix) element wise
+ */
+template<typename T, int dim>
+Vector<T, dim> divElementwise(const Vector<T, dim>& v1, const Vector<T, dim>& v2) {
+   Vector<T, dim> result;
+   for (size_t i = 0; i < dim; ++i) 
+      result[i] = divElementwise(v1[i],v2[i]);
    return result;
 }
 
