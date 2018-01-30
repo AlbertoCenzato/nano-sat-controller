@@ -1,0 +1,81 @@
+{
+  "configurations": [
+    {
+      "inheritEnvironments": [
+        "msvc_x86"
+      ],
+      "name": "x86-Debug",
+      "includePath": [
+        "${env.INCLUDE}",
+        "C:\\Users\\alber\\Source\\Repos\\nano-sat-controller\\src\\ctrl",
+        "C:\\Users\\alber\\Source\\Repos\\nano-sat-controller\\src\\ui",
+        "C:\\USERS\\ALBER\\SOURCE\\REPOS\\NANO-SAT-CONTROLLER\\INCLUDE\\UI",
+        "C:\\Users\\alber\\Source\\Repos\\nano-sat-controller\\include"
+      ],
+      "defines": [
+        "WIN32",
+        "_DEBUG",
+        "UNICODE",
+        "_UNICODE"
+      ],
+      "intelliSenseMode": "msvc-x86"
+    },
+    {
+      "inheritEnvironments": [
+        "msvc_x86"
+      ],
+      "name": "x86-Release",
+      "includePath": [
+        "${env.INCLUDE}",
+        "C:\\Users\\alber\\Source\\Repos\\nano-sat-controller\\src\\ctrl",
+        "C:\\Users\\alber\\Source\\Repos\\nano-sat-controller\\src\\ui",
+        "C:\\USERS\\ALBER\\SOURCE\\REPOS\\NANO-SAT-CONTROLLER\\INCLUDE\\UI"
+      ],
+      "defines": [
+        "WIN32",
+        "NDEBUG",
+        "UNICODE",
+        "_UNICODE"
+      ],
+      "intelliSenseMode": "msvc-x86"
+    },
+    {
+      "inheritEnvironments": [
+        "msvc_x64"
+      ],
+      "name": "x64-Debug",
+      "includePath": [
+        "${env.INCLUDE}",
+        "C:\\Users\\alber\\Source\\Repos\\nano-sat-controller\\src\\ctrl",
+        "C:\\Users\\alber\\Source\\Repos\\nano-sat-controller\\src\\ui",
+        "C:\\USERS\\ALBER\\SOURCE\\REPOS\\NANO-SAT-CONTROLLER\\INCLUDE\\UI"
+      ],
+      "defines": [
+        "WIN32",
+        "_DEBUG",
+        "UNICODE",
+        "_UNICODE"
+      ],
+      "intelliSenseMode": "msvc-x64"
+    },
+    {
+      "inheritEnvironments": [
+        "msvc_x64"
+      ],
+      "name": "x64-Release",
+      "includePath": [
+        "${env.INCLUDE}",
+        "C:\\Users\\alber\\Source\\Repos\\nano-sat-controller\\src\\ctrl",
+        "C:\\Users\\alber\\Source\\Repos\\nano-sat-controller\\src\\ui",
+        "C:\\USERS\\ALBER\\SOURCE\\REPOS\\NANO-SAT-CONTROLLER\\INCLUDE\\UI"
+      ],
+      "defines": [
+        "WIN32",
+        "NDEBUG",
+        "UNICODE",
+        "_UNICODE"
+      ],
+      "intelliSenseMode": "msvc-x64"
+    }
+  ]
+}

@@ -34,7 +34,6 @@ configure_file (config.h.in ${CMAKE_SOURCE_DIR}/include/config.h )
 # disable gcc-6 warning about compatibility with gcc-7 compiled code
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-psabi")
 
-
 include_directories(include 3rdparty)
 
 # add 3rd party code as library
@@ -43,6 +42,7 @@ file (GLOB_RECURSE JSONCPP_SRC 3rdparty/jsoncpp/*.cpp)
 add_library (3rdparty ${GNUBLIN_API_SRC} ${JSONCPP_SRC})
 
 file (GLOB_RECURSE UTILS_SRC	 src/utils/*.cpp)
+file (GLOB_RECURSE UI_SRC		 src/ui/*.cpp)		
 file (GLOB_RECURSE SELF_TEST_SRC src/self_test/*.cpp)
 file (GLOB_RECURSE TEST_SRC		 src/test/*.cpp)	
 file (GLOB_RECURSE DEVICES_SRC	 src/devices/*.cpp)
@@ -50,7 +50,7 @@ file (GLOB_RECURSE CTRL_SRC		 src/ctrl/*.cpp)
 file (GLOB		   GLOB_SRC		 src/*.cpp)
 
 set (EXECUTABLE ${PROJECT_NAME}.exe)
-add_executable(${EXECUTABLE} ${GLOB_SRC} ${CTRL_SRC} ${DEVICES_SRC} ${TEST_SRC} ${SELF_TEST_SRC} ${UTILS_SRC})
+add_executable(${EXECUTABLE} ${GLOB_SRC} ${CTRL_SRC} ${DEVICES_SRC} ${TEST_SRC} ${SELF_TEST_SRC} ${UI_SRC} ${UTILS_SRC})
 
 add_dependencies(${EXECUTABLE} 3rdparty)
 target_link_libraries(${EXECUTABLE} 3rdparty ${OpenCV_LIBS} pthread stdc++fs)

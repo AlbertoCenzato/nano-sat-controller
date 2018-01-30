@@ -4,7 +4,7 @@
 #include "config.h"
 #include "NanoSat.hpp"
 #include "test/Test.hpp"
-#include "utils/UI.hpp"
+#include "ui/UI.hpp"
 #include "utils/Settings.hpp"
 #include "utils/OSSignalHandler.hpp"
 #include "test/Calibration.hpp"
@@ -13,10 +13,12 @@ namespace test = sat::test;
 using std::this_thread::sleep_for;
 
 using namespace sat::utils;
+using namespace sat::ui;
 
+void run(sat::NanoSat& nanoSat, const Vector3f &target);
 void runTests(const sat::NanoSat& nanoSat);
 void calibrate(sat::NanoSat& nanoSat);
-void executeMainProgram(sat::NanoSat& satellite, const Vector3f &target);
+void runStandardMode(sat::NanoSat& satellite, const Vector3f &target);
 
 
 int main()
@@ -52,15 +54,17 @@ int main()
 
 			// let the user choose operating mode
 			const auto mode = ui::selectFromList({ "run standard mode",
+                                                "run (select control axis)",
 										                  "run tests",
 										                  "calibrate",
 			                                       "exit"});
 			// run in the selected mode
 			switch (mode) {
-			case 2:	runTests(satellite); break;
-			case 3:	calibrate(satellite); break;
-         case 4:  break;
-			default: executeMainProgram(satellite, settings.global.target);
+         case 2:  run(satellite, settings.global.target); break;
+			case 3:	runTests(satellite); break;
+			case 4:	calibrate(satellite); break;
+         case 5:  break;
+			default: runStandardMode(satellite, settings.global.target);
 			}
 			
          exit = ui::yesNoAnswer("Exit program?");
@@ -81,17 +85,7 @@ int main()
 }
 
 
-void executeMainProgram(sat::NanoSat &satellite, const Vector3f &target) {
-	// ----- perform startup tests -----
-   Log::info << "Performing tests for all attached devices...";
-   auto result = satellite.selfTest();
-	if (result.hasErrOrWarn()) {
-		Log::err << "WARNING: Not all devices passed tests!";
-		Log::err << result;
-	}
-	else {
-		Log::info << "Tests passed!";
-	}
+void runStandardMode(sat::NanoSat &satellite, const Vector3f &target) {
 
    std::cout << "Re-calibrating IMU... hold the nano sat in (0,0,0)... " << std::endl;
    satellite.getIMU()->reset();
@@ -104,6 +98,33 @@ void executeMainProgram(sat::NanoSat &satellite, const Vector3f &target) {
    op.actuatorX = satellite.getDCMotor(Axis::X);
    op.actuatorY = satellite.getDCMotor(Axis::Y);
    op.actuatorZ = satellite.getDCMotor(Axis::Z);
+   op.imu       = satellite.getIMU();
+   op.finalState = target;
+
+	if (satellite.move(op))
+		std::cout << "Target reached!" << std::endl;
+	else
+		std::cout << "Couldn't reach target!" << std::endl;
+
+	// do some operations here
+
+}
+
+void run(sat::NanoSat &satellite, const Vector3f &target) {
+
+   std::cout << "Re-calibrating IMU... hold the nano sat in (0,0,0)... " << std::endl;
+   satellite.getIMU()->reset();
+   std::cout << "Done!" << std::endl;
+
+   auto selected = ui::multipleSelectFromList({"Control X axis", "Control Y axis", "Control Z axis"});
+
+   sat::trackMotionUntilKeyPress(satellite, 
+      "Move the nano satellite to desired initial position. Press [ENTER] when in position.");
+
+   sat::ctrl::Operation op;
+   op.actuatorX = selected[0] ? satellite.getDCMotor(Axis::X) : nullptr;
+   op.actuatorY = selected[1] ? satellite.getDCMotor(Axis::Y) : nullptr;
+   op.actuatorZ = selected[2] ? satellite.getDCMotor(Axis::Z) : nullptr;
    op.imu       = satellite.getIMU();
    op.finalState = target;
 

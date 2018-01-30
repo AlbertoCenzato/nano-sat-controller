@@ -27,6 +27,8 @@ GNU License V3 for more details: https://www.gnu.org/licenses/gpl-3.0.html
 #include "devices/Interfaces.hpp"
 #include "utils/Exceptions.hpp"
 #include "utils/UI.hpp"
+#include "../../include/devices/Interfaces.hpp"
+#include "../../include/ctrl/Controller.hpp"
 
 
 using std::vector;
@@ -36,6 +38,8 @@ using sat::utils::scheduling_error;
 
 namespace sat {
 namespace ctrl {
+
+
 
 // --------------------------------------------------------------
 // ---------------------- Operation -----------------------------
@@ -80,7 +84,7 @@ Controller& Controller::addOperation(Operation op) {
 
 bool Controller::run() {
 
-   for (const auto &op : opList) {
+   for (auto &op : opList) {
       if (!checkIfValid(op)) {
          Log::err << "INVALID OPERATION: " << op.toString();
          return false;
@@ -212,7 +216,7 @@ void Controller::clearOperations() {
 
 
 
-bool Controller::checkIfValid(const Operation& op) const {
+bool Controller::checkIfValid(Operation& op) const {
    Log::debug << "Checking if valid operation...";
 
 	if (op.imu == nullptr) {
@@ -222,31 +226,34 @@ bool Controller::checkIfValid(const Operation& op) const {
 
 	auto state = op.imu->getState();
 
+   int actuatorCount = 3;
    if (op.actuatorX == nullptr) {
-      if (state[0] < op.finalState[0] - tolerance || state[0] > op.finalState[0] + tolerance) {
-         Log::err << "You want me to move along X axis, but you did not declare an X axis actuator!";
-         return false;
-      }
-      Log::err << "No X-axis actuator provided!";
-      return false;
+      if (state[0] < op.finalState[0] - tolerance || state[0] > op.finalState[0] + tolerance)
+         Log::warn << "You want me to move along X axis, but you did not declare an X axis actuator!";
+
+      op.actuatorX = &stubActuator;
+      --actuatorCount;
    }
    if (op.actuatorY == nullptr) {
-      if (state[1] < op.finalState[1] - tolerance || state[1] > op.finalState[1] + tolerance) {
-         Log::err << "You want me to move along Y axis, but you did not declare an Y axis actuator!";
-         return false;
-      }
-      Log::err << "No Y-axis actuator provided!";
-      return false;
+      if (state[1] < op.finalState[1] - tolerance || state[1] > op.finalState[1] + tolerance)
+         Log::warn << "You want me to move along Y axis, but you did not declare an Y axis actuator!";
+      
+      op.actuatorY = &stubActuator;
+      --actuatorCount;
    }
    if (op.actuatorZ == nullptr) {
-      if (state[2] < op.finalState[2] - tolerance || state[2] > op.finalState[2] + tolerance) {
-         Log::err << "You want me to move along Z axis, but you did not declare an Z axis actuator!";
-         return false;
-      }
-      Log::err << "No Z-axis actuator provided!";
+      if (state[2] < op.finalState[2] - tolerance || state[2] > op.finalState[2] + tolerance)
+         Log::warn << "You want me to move along Z axis, but you did not declare an Z axis actuator!";
+
+      op.actuatorZ = &stubActuator;
+      --actuatorCount;
+   }
+
+   if (actuatorCount < 1) {
+      Log::err << "No actuator defined! Empty operation!";
       return false;
    }
-   Log::debug << "Done! Valid operation.";
+
 	return true;
 }
 

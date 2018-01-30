@@ -18,18 +18,13 @@ GNU License V2 for more details: https://www.gnu.org/licenses/gpl-2.0.html
 #include <vector>
 #include <iostream>
 #include <iomanip>
-#include <atomic>
-
-using std::cout;
-using std::endl;
-using std::cerr;
 
 namespace sat {
-namespace utils {
-
 namespace ui {
 
 	int selectFromList(const std::vector<std::string>& options);
+
+   std::vector<bool> multipleSelectFromList(const std::vector<std::string>& options);
 
    template<typename T>
    void print(const std::vector<T>& vec) {
@@ -42,20 +37,7 @@ namespace ui {
 
 	void clearConsole();
 
-   void waitKey(std::string message = "Press Enter to Continue");
-
-   void asyncWaitKey(std::atomic_bool &flag, std::string message = "Press Enter to Continue");
-
-   template<typename T>
-   T read() {
-      T ch;
-      std::cin >> ch;
-      std::cin.ignore();
-      return ch;
-   }
-
    bool yesNoAnswer(const std::string& question);
 
-} // namespace ui	
-} // namespace utils
+} // namespace ui
 } // namespace sat

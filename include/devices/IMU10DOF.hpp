@@ -203,7 +203,7 @@ public:
 
    /**
     * @brief resets sensor fusion algorithm to initial conditions 
-    *        and re-calibrates accelerometer and gyroscope
+    *        and re-calibrates accelerometer.
     *        
     * @note do not move the nano satellite while this function is executed
     */

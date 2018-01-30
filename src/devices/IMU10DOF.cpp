@@ -56,7 +56,9 @@ IMU10DOF::IMU10DOF(const utils::IMUSettings & s)
 	sleep_for(seconds(1));
 
 	// calibrates the gyroscope and accelerometer offsets assuming the device is in a stationary situation
-	reset();
+	sensorFusionAlg->reset();
+   gyros.zeroCalibrate(128, milliseconds(5));
+   accel.zeroCalibrate(128, milliseconds(5), accelRotMat.t()*utils::Axis::Z);
 }
 
 
@@ -112,7 +114,7 @@ PressureSensor* IMU10DOF::getPressureSensor() { return &press; }
 
 void IMU10DOF::reset() {
 	sensorFusionAlg->reset();
-   gyros.zeroCalibrate(128, milliseconds(5));
+   //gyros.zeroCalibrate(128, milliseconds(5));
    accel.zeroCalibrate(128, milliseconds(5), accelRotMat.t()*utils::Axis::Z);
 }
 

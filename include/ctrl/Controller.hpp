@@ -62,6 +62,32 @@ struct Operation {
    std::string toString() const noexcept;
 };
 
+/**
+ * @brief This class is used to replace Operation's missing actuators,
+ *        letting Controller::run() working with one, two or three axis. 
+ */
+class StubActuator : public device::IActuator {
+
+public:
+
+   std::string getID() const noexcept override {
+      return "Stub_Actuator";
+   }
+
+   std::string toString() const noexcept override {
+      return getID();
+   }
+
+   TestResult selfTest() noexcept override {
+      return {};
+   }
+
+   bool isAvailable() const noexcept override {
+      return true;
+   }
+
+   void act(float action) override {}
+};
 
 
 /**
@@ -119,6 +145,8 @@ private:
    const uint32_t MEASUREMENTS_PER_CONTROL;
    const std::chrono::milliseconds CTRL_LOOP_TIMEOUT;
 
+   mutable StubActuator stubActuator;
+
    /**
     * @brief private version of run(), it executes the control loop
     * TODO: this function should be noexcept. 
@@ -132,7 +160,7 @@ private:
 	*			 Called by run() before passing the operation to the controller.
 	*	@param op: operation to check.
 	*/
-	bool checkIfValid(const ctrl::Operation& op) const;
+	bool checkIfValid(ctrl::Operation& op) const;
 
 };
 
