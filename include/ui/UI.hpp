@@ -19,25 +19,30 @@ GNU License V2 for more details: https://www.gnu.org/licenses/gpl-2.0.html
 #include <iostream>
 #include <iomanip>
 
+#include "ui/IO.hpp"
+
+using std::cout;
+using std::endl;
+
 namespace sat {
 namespace ui {
 
-	int selectFromList(const std::vector<std::string>& options);
+int selectFromList(const std::vector<std::string>& options);
 
-   std::vector<bool> multipleSelectFromList(const std::vector<std::string>& options);
+std::vector<bool> multipleSelectFromList(const std::vector<std::string>& options);
 
-   template<typename T>
-   void print(const std::vector<T>& vec) {
-      std::cout << "(" << std::setprecision(3);
-      for (auto i = 0; i < vec.size()-1; ++i) {
-         std::cout << vec[i] << ",";
-      }
-      std::cout << vec[vec.size() - 1] << ")" << std::endl;
+template<typename T>
+void print(const std::vector<T>& vec) {
+	std::cout << "(" << std::setprecision(3);
+   for (auto i = 0; i < vec.size()-1; ++i) {
+	std::cout << vec[i] << ",";
    }
+	std::cout << vec[vec.size() - 1] << ")" << std::endl;
+}
 
-	void clearConsole();
+void clearConsole();
 
-   bool yesNoAnswer(const std::string& question);
+bool yesNoAnswer(const std::string& question);
 
 } // namespace ui
 } // namespace sat

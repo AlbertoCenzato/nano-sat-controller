@@ -18,7 +18,7 @@ GNU License V3 for more details: https://www.gnu.org/licenses/gpl-3.0.html
 #include "NanoSat.hpp"
 
 #include "utils/Settings.hpp"
-#include "utils/UI.hpp"
+#include "ui/UI.hpp"
 
 
 using sat::device::CurrentSensor;
@@ -90,8 +90,6 @@ NanoSat::NanoSat(const NanoSatSettings &settings) : controller(settings.controll
 	if(testResult.hasErrOrWarn())
 	   Log::err << testResult;
 }
-
-NanoSat::~NanoSat() { }
 
 #pragma endregion constructors
 
@@ -204,13 +202,13 @@ vector<ISensor*> NanoSat::getSensorsList(Axis axis) const {
 	return list;
 }
 
-bool NanoSat::performHoming() {
+bool NanoSat::goHome() {
    ctrl::Operation op;
    op.actuatorX = getDCMotor(Axis::X);
    op.actuatorY = getDCMotor(Axis::Y);
    op.actuatorZ = getDCMotor(Axis::Z);
    op.imu = getIMU();
-   op.finalState = {0.f, 0.f, 0.f};
+   op.targetState = {0.f, 0.f, 0.f};
 	
 	Log::info << "Going home...";
 	return move(op);
@@ -237,12 +235,11 @@ void NanoSat::setSensorFusionAlgorithm(FilterAlgorithmPtr<Matrix3f3, Vector4f>&&
 
 void trackMotionUntilKeyPress(const NanoSat& satellite, std::string message) {
    auto imu = satellite.getIMU();
-   //imu->startReading();
    std::atomic_bool stop(false);
-   utils::ui::asyncWaitKey(stop, message);
+   ui::asyncWaitKey(stop, message);
    while (!stop) {
       const auto state = imu->getState();
-      utils::ui::clearConsole();
+      ui::clearConsole();
       std::cout << message << std::endl;
       std::cout << "(X, Y, Z): " << state << std::endl;
       this_thread::sleep_for(chrono::milliseconds(100));

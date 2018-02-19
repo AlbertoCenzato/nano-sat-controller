@@ -252,21 +252,6 @@ Vector<T, dim> divElementwise(const Vector<T, dim>& v1, const Vector<T, dim>& v2
 }
 
 /**
- * @brief Tests if two Vectors are equals taking into account a certain degree of tolerance
- * 
- * In practice computes std::abs(vec1[i] - vec2[i]) <= tolerance for each element of vec1 and vec2,
- * if each element passes the test then returns true.
- */
-template<typename T, int dim>
-bool equalsWithTolerance(const Vector<T, dim>& vec1, const Vector<T, dim>& vec2, float tolerance) {
-	for (auto i = 0; i < dim; ++i) {
-		if (std::abs(vec1[i] - vec2[i]) > tolerance)
-			return false;
-	}
-	return true;
-}
-
-/**
  *	@brief Extension of std::isnan to Vector. Calls isnan on
  *			each element of Vector.
  *	@return true if at least one element of vec isnan, false otherwise

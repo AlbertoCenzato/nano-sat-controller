@@ -226,7 +226,7 @@ void ControllerSettings::load(const Json::Value& value) {
 	if (!Kp.isNull() && Kp.isArray()) {
       const auto size = Kp.size();
       for (size_t i = 0; i < 3 && i < size; ++i)
-		   kp[i] = Kp[i].asFloat();
+		   kp[i] = Kp[int(i)].asFloat();
    }
    if (!Ki.isNull() && Ki.isArray()) {
       const auto size = Ki.size();
@@ -236,7 +236,7 @@ void ControllerSettings::load(const Json::Value& value) {
    if (!Kd.isNull() && Kd.isArray()) {
       const auto size = Ki.size();
       for (size_t i = 0; i < 3 && i < size; ++i)
-         kd[i] = Kd[i].asFloat();
+         kd[i] = Kd[int(i)].asFloat();
    }
 
    auto& measPerControl = value["measurementsPerControl"];
@@ -246,6 +246,10 @@ void ControllerSettings::load(const Json::Value& value) {
    auto& controlLoopTimeout = value["ctrlLoopTimeout"];
    if (!controlLoopTimeout.isNull())
       ctrlLoopTimeout = std::chrono::milliseconds(controlLoopTimeout.asUInt());
+
+	auto& totControlTimeout = value["totCtrlTimeout"];
+	if (!totControlTimeout.isNull())
+		totCtrlTimeout = std::chrono::milliseconds(totControlTimeout.asUInt());
 }
 
 #pragma endregion derived_settings

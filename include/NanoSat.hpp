@@ -42,8 +42,8 @@ namespace sat
 namespace device {
 	class IActuator;
 	class ISensor;
-	using ActuatorPtr = unique_ptr<IActuator>;
-	using SensorPtr   = unique_ptr<ISensor>;
+	using ActuatorPtr = std::unique_ptr<IActuator>;
+	using SensorPtr   = std::unique_ptr<ISensor>;
 }
 
 namespace utils {
@@ -76,7 +76,7 @@ public:
 	 */
 	explicit NanoSat(const utils::NanoSatSettings& settings);
 
-	~NanoSat();
+	~NanoSat() = default;
 
 
 	/**
@@ -129,21 +129,21 @@ public:
 	 *			 The list can be filtered by axis.
 	 * @param axis: optional filter on axis.
 	 */
-	vector<device::IActuator*> getActuatorsList(utils::Axis axis = utils::Axis::ALL) const;
+	std::vector<device::IActuator*> getActuatorsList(utils::Axis axis = utils::Axis::ALL) const;
 
 	/**
 	 * @brief Gets the list of sensors attached to the NanoSat.
 	 *			 The list can be filtered by axis.
 	 * @param axis: optional filter on axis.
 	 */
-	vector<device::ISensor*> getSensorsList(utils::Axis axis = utils::Axis::ALL) const;
+	std::vector<device::ISensor*> getSensorsList(utils::Axis axis = utils::Axis::ALL) const;
 
 	/**
 	 *	@brief Moves the nano sat in position (0,0,0)
 	 *			 of the fixed reference frame.
 	 *	@return true if homing has been completed successfully.
 	 */
-	bool performHoming();
+	bool goHome();
 
 	/**
 	 * @brief Moves the nano sat as specified by the operation.
@@ -182,9 +182,9 @@ private:
 
 	ctrl::Controller controller;
 
-	vector<AttachedDevice<device::MotorActuator>> motorDesc;
-	vector<AttachedDevice<device::FeedbackCoil>>  coilDesc;
-	vector<AttachedDevice<device::CurrentSensor>> currSensorDesc;
+	std::vector<AttachedDevice<device::MotorActuator>> motorDesc;
+	std::vector<AttachedDevice<device::FeedbackCoil>>  coilDesc;
+	std::vector<AttachedDevice<device::CurrentSensor>> currSensorDesc;
 
    AttachedDevice<device::TemperatureSensor> tempSensorDesc;
    AttachedDevice<device::IMU10DOF> imuDesc;

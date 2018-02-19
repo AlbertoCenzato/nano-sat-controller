@@ -34,7 +34,7 @@ class Logger<LogLevel::info> {
    bool available;
 
 public:
-   explicit Logger(std::shared_ptr<spdlog::logger> logger, bool available) : logger(logger), available(available) { }
+   explicit Logger(std::shared_ptr<spdlog::logger> logger, bool available) : logger(std::move(logger)), available(available) { }
    
    const Logger<LogLevel::info>& operator<<(const char* message) const noexcept {
       if (available) logger->info(message);
@@ -50,7 +50,7 @@ class Logger<LogLevel::critical> {
    bool available;
 
 public:
-   explicit Logger(std::shared_ptr<spdlog::logger> logger, bool available) : logger(logger), available(available) { }
+   explicit Logger(std::shared_ptr<spdlog::logger> logger, bool available) : logger(std::move(logger)), available(available) { }
 
    const Logger<LogLevel::critical>& operator<<(const char* message) const noexcept {
       if (available) logger->critical(message);
@@ -66,7 +66,7 @@ class Logger<LogLevel::trace> {
    bool available;
 
 public:
-   explicit Logger(std::shared_ptr<spdlog::logger> logger, bool available) : logger(logger), available(available) { }
+   explicit Logger(std::shared_ptr<spdlog::logger> logger, bool available) : logger(std::move(logger)), available(available) { }
 
    const Logger<LogLevel::trace>& operator<<(const char* message) const noexcept {
       if (available) logger->trace(message);
@@ -83,7 +83,7 @@ class Logger<LogLevel::warn> {
    bool available;
 
 public:
-   explicit Logger(std::shared_ptr<spdlog::logger> logger, bool available) : logger(logger), available(available) { }
+   explicit Logger(std::shared_ptr<spdlog::logger> logger, bool available) : logger(std::move(logger)), available(available) { }
 
    const Logger<LogLevel::warn>& operator<<(const char* message) const noexcept {
       if (available) logger->warn(message);
@@ -99,7 +99,7 @@ class Logger<LogLevel::debug> {
    bool available;
 
 public:
-   explicit Logger(std::shared_ptr<spdlog::logger> logger, bool available) : logger(logger), available(available) { }
+   explicit Logger(std::shared_ptr<spdlog::logger> logger, bool available) : logger(std::move(logger)), available(available) { }
 
    const Logger<LogLevel::debug>& operator<<(const char* message) const noexcept {
       if (available) logger->debug(message);
@@ -116,7 +116,7 @@ class Logger<LogLevel::err> {
 
 public:
    explicit Logger(std::shared_ptr<spdlog::logger> logger = nullptr, bool available = false) 
-      : logger(logger), available(available) { }
+      : logger(std::move(logger)), available(available) { }
 
    const Logger<LogLevel::err>& operator<<(const char* message) const noexcept {
       if (available) logger->error(message);

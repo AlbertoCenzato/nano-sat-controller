@@ -28,6 +28,8 @@ GNU License V3 for more details: https://www.gnu.org/licenses/gpl-3.0.html
 #include "utils/Logger.hpp"
 #include "utils/Settings.hpp"
 #include "devices/IMU10DOF.hpp"
+#include "utils/Vector.hpp"
+#include "self_test/TestResult.hpp"
 
 
 namespace sat {
@@ -41,53 +43,27 @@ using device::IMU10DOF;
 namespace ctrl {
 
 /**
- * @brief Sets current thread to maximum priority
- * @throws sat::utils::scheduling_error
- */
-void setMaxSchedulingPriority() throw(sat::utils::scheduling_error);
-
-/**
  *	@brief Operation defines what state the nano sat should reach 
  *			 and what actuators should it use to reach it
  */
 struct Operation {
+	enum class Type {
+		move,
+		nop
+	};
 
+	Type type;
 	IActuator *actuatorX;
 	IActuator *actuatorY;
    IActuator *actuatorZ;
 	IMU10DOF *imu;
 
-	utils::Vector3f finalState;
+	utils::Vector3f targetState;
 
    std::string toString() const noexcept;
 };
 
-/**
- * @brief This class is used to replace Operation's missing actuators,
- *        letting Controller::run() working with one, two or three axis. 
- */
-class StubActuator : public device::IActuator {
 
-public:
-
-   std::string getID() const noexcept override {
-      return "Stub_Actuator";
-   }
-
-   std::string toString() const noexcept override {
-      return getID();
-   }
-
-   TestResult selfTest() noexcept override {
-      return {};
-   }
-
-   bool isAvailable() const noexcept override {
-      return true;
-   }
-
-   void act(float action) override {}
-};
 
 
 /**
@@ -127,25 +103,73 @@ public:
 	bool run();
 
 	/**
-	 *	@brief Returns the tolerance run() function uses to compare current and final state.
-	 */
-	float getTolerance() const;
-
-
-	/**
 	 *	@brief Specifies the control function to be used (default control function is a PID)
 	 */
 	void setControlFunction(std::unique_ptr<ControlAlgorithm<utils::Vector3f>>&& controlFunction);
 
 private:
-	float tolerance;
+
+	/**
+	* @brief This class is used to replace Operation's missing actuators,
+	*        letting Controller::run() working with one, two or three axis.
+	*/
+	class StubActuator : public device::IActuator {
+	public:
+		std::string getID() const noexcept override { return "Stub_Actuator"; }
+		std::string toString() const noexcept override { return getID(); }
+		TestResult selfTest() noexcept override { return {}; }
+		bool isAvailable() const noexcept override { return false; }
+		void act(float action) override {}
+	};
+
+	/**
+	 *	@brief This struct represents the logic state Controller is in
+	 */
+	struct ControllerLogic {
+
+		ControllerLogic(float tolerance, std::chrono::milliseconds ctrlLoopTimeout, std::chrono::milliseconds totCtrlTimeout);
+
+		void reset(const utils::Vector3f &newFinalState, const std::array<bool, 3> &usedAxis);
+
+		bool hasFinishedOperation(const utils::Vector3f &state);
+
+	private:
+		std::chrono::steady_clock::time_point startTime;
+		std::chrono::steady_clock::time_point reachingTime;
+		utils::Vector3f target;
+		bool targetReached = false;
+		bool finishedOperation = false;
+		std::array<bool, 3> usedAxis;
+		
+		const float tolerance;
+
+		// when target reached controller continues running for CTRL_LOOP_TIMEOUT ms
+		const std::chrono::milliseconds CTRL_LOOP_TIMEOUT;
+
+		// if has run for more than TOT_CTRL_TIMEOUT ms on a single operation, 
+		//	stop and continue with the next one
+		const std::chrono::milliseconds TOT_CTRL_TIMEOUT;
+
+		
+		bool hasReachedTargetState(const utils::Vector3f &state);
+	};
+
+	const float tolerance;
 	std::vector<Operation> opList;
 	bool controlThreadReturnVal;
 	std::unique_ptr<ControlAlgorithm<utils::Vector3f>> controlFunction;
    const uint32_t MEASUREMENTS_PER_CONTROL;
-   const std::chrono::milliseconds CTRL_LOOP_TIMEOUT;
 
-   mutable StubActuator stubActuator;
+	ControllerLogic controllerState;
+   mutable StubActuator stubActuator; // stub actuator used to replace operation's nullptrs
+
+	/**
+	 *	@brief checks if the given operation is properly defined;
+	 *			 i.e. it has all actuators necessary to get to the final state.
+	 *			 Called by run() before passing the operation to the controller.
+	 *	@param op: operation to check.
+	 */
+	bool validateOperation(ctrl::Operation& op) const;
 
    /**
     * @brief private version of run(), it executes the control loop
@@ -154,13 +178,11 @@ private:
     */
 	void run_();
 
-	/**
-	*	@brief checks if the given operation is properly defined;
-	*			 i.e. it has all actuators necessary to get to the final state.
-	*			 Called by run() before passing the operation to the controller.
-	*	@param op: operation to check.
-	*/
-	bool checkIfValid(ctrl::Operation& op) const;
+	bool increaseSchedulingPriority() const;
+
+	bool restoreSchedulingPriority() const;
+
+	
 
 };
 

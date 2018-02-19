@@ -246,10 +246,11 @@ struct ControllerSettings : SettingsBase {
    Vector3f kd;         // PID derivative gain
 
    uint32_t measurementsPerControl = 10;
-   std::chrono::milliseconds ctrlLoopTimeout; 
+   std::chrono::milliseconds ctrlLoopTimeout;
+	std::chrono::milliseconds totCtrlTimeout;
 
-	ControllerSettings() : ctrlLoopTimeout(20000) { }
-	explicit ControllerSettings(const Json::Value& value) : ctrlLoopTimeout(20000) {
+	ControllerSettings() : ctrlLoopTimeout(20000), totCtrlTimeout(60000) { }
+	explicit ControllerSettings(const Json::Value& value) : ControllerSettings() {
       ControllerSettings::load(value);
 	}
 

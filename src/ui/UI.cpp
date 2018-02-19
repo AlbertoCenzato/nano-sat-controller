@@ -74,19 +74,22 @@ namespace ui {
       const ColorModifier highlight(ColorCode::REVERSE);
 
       const auto numOfOptions = options.size();
-      vector<bool> selections(false, numOfOptions);
+      vector<bool> selections(numOfOptions, false);
 
       int index = 0;
       bool exit = false;
       while (!exit) {
          clearConsole();
 
-         cout << "Select the highlighted option pressing [s], move up and down with arrows." << endl;
+         cout << "Select the highlighted option pressing [s], move up and down with [q] and [a]." << endl;
          cout << "When done press [ENTER].\n" << endl;
          for (size_t i = 0; i < numOfOptions; ++i) {
-            if (selections[i]) cout << selected;
-            if (i == index)    cout << highlight;
-            else               cout << reset;
+				if (!selections[i] && i != index)
+					cout << reset;
+				else {
+					if (selections[i]) cout << selected;
+					if (i == index)    cout << highlight;
+				}
 
             cout << options[i] << reset << endl;
          }
