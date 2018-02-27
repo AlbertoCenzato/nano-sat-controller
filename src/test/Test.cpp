@@ -26,14 +26,20 @@ GNU License V2 for more details: https://www.gnu.org/licenses/gpl-2.0.html
 #include "devices/AlignmentSensor.hpp"
 #include "devices/PowerBoard.hpp"
 #include "utils/Logger.hpp"
-#include "utils/UI.hpp"
+#include "ui/UI.hpp"
 #include "utils/Settings.hpp"
 #include "ctrl/Controller.hpp"
+
+namespace sat {
+	namespace device {
+		class ISensor;
+	}
+}
 
 using std::this_thread::sleep_for;
 
 using sat::utils::Logger;
-namespace ui = sat::utils::ui;
+namespace ui = sat::ui;
 using sat::device::ISensor;
 using sat::device::IActuator;
 using sat::device::IMU10DOF;
@@ -427,6 +433,14 @@ void Test::testGyroscopeImuError() const {
       prevValues = gyroValues;
       sleep_for(chrono::milliseconds(50));
    }
+
+	try {
+		ctrl::restoreDefaultPriority();
+	}
+	catch (const utils::scheduling_error &ex) {
+		std::cerr << ex.what() << std::endl;
+		return;
+	}
 
    cout << "Mean error: " << error / count << endl;
 }

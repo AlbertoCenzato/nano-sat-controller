@@ -40,18 +40,6 @@ cpu_set_t cpuSet;
 namespace sat {
 namespace ctrl {
 
-/**
- * @brief Sets current thread to maximum priority
- * @throws sat::utils::scheduling_error
- */
-void setMaxSchedulingPriority();
-
-/**
- *	@brief Restores default scheduling priority for current thread
- *	@throws sat::utils::scheduling_error
- */
-void restoreDefaultPriority();
-
 
 // --------------------------------------------------------------
 // ---------------------- Operation -----------------------------
@@ -390,7 +378,7 @@ void restoreDefaultPriority() {
 	const auto this_pthread = pthread_self();
 
 	// set high priority scheduling params
-	const auto schedPolicyError = pthread_setschedparam(this_pthread, &policy, &param);
+	const auto schedPolicyError = pthread_setschedparam(this_pthread, policy, &param);
 	switch (schedPolicyError) {
 		case 0:		  break; // everything fine
 		case ESRCH:   throw scheduling_error("No thread with the ID thread could be found.");

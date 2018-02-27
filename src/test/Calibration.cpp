@@ -21,7 +21,7 @@
 
 #include "NanoSat.hpp"
 #include "devices/IMU10DOF.hpp"
-#include "utils/UI.hpp"
+#include "ui/UI.hpp"
 
 using namespace sat::utils;
 

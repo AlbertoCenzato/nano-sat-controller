@@ -43,6 +43,19 @@ using device::IMU10DOF;
 namespace ctrl {
 
 /**
+ * @brief Sets current thread to maximum priority
+ * @throws sat::utils::scheduling_error
+ */
+void setMaxSchedulingPriority();
+
+/**
+ *	@brief Restores default scheduling priority for current thread
+ *	@throws sat::utils::scheduling_error
+ */
+void restoreDefaultPriority();
+
+
+/**
  *	@brief Operation defines what state the nano sat should reach 
  *			 and what actuators should it use to reach it
  */
@@ -134,8 +147,7 @@ private:
 		bool hasFinishedOperation(const utils::Vector3f &state);
 
 	private:
-		std::chrono::steady_clock::time_point startTime;
-		std::chrono::steady_clock::time_point reachingTime;
+		std::chrono::time_point<std::chrono::high_resolution_clock> startTime, reachingTime;
 		utils::Vector3f target;
 		bool targetReached = false;
 		bool finishedOperation = false;

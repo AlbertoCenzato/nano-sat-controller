@@ -21,7 +21,7 @@ int __main__()
    op.actuatorY = satellite.getCoil(Axis::Y);  // retrieve y-axis coil
    op.actuatorZ = satellite.getCoil(Axis::Z);  // retrieve z-axis coil
    op.imu = satellite.getIMU();   // retrieve imu
-   op.finalState = { 0.f, 0.f, 0.f };
+   op.targetState = { 0.f, 0.f, 0.f };
     
 	auto success = satellite.move(op);	// execute maneuver
 	if (success) {
