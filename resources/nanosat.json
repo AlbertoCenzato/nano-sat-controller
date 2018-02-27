@@ -2,7 +2,7 @@
 	"global": {
     "logFilePath": "/home/pi/Desktop/nanosat.log",
     "logLevel": "warn" ,
-    "target": [0.0, 0.0, 45.0] 
+    "target": [0.0, 0.0, 45.0]
 	},
    "nanoSat": {
       "camera": {

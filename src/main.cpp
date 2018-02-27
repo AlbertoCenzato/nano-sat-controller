@@ -11,6 +11,7 @@
 #include "utils/OSSignalHandler.hpp"
 #include "test/Calibration.hpp"
 #include "utils/Exceptions.hpp"
+#include "../include/ui/UI.hpp"
 
 
 namespace test = sat::test;
@@ -97,6 +98,8 @@ void executeMainProgram(sat::NanoSat &satellite, const Vector3f &target) {
 		Log::info << "Tests passed!";
 	}
 
+	auto axis = sat::ui::multipleSelectFromList({ "use X axis", "use Y axis", "use Z axis" });
+
    std::cout << "Re-calibrating IMU... hold the nano sat in (0,0,0)... " << std::endl;
    satellite.getIMU()->reset();
    std::cout << "Done!" << std::endl;
@@ -105,9 +108,18 @@ void executeMainProgram(sat::NanoSat &satellite, const Vector3f &target) {
       "Move the nano satellite to desired initial position. Press [ENTER] when in position.");
 
    sat::ctrl::Operation op;
-   op.actuatorX   = satellite.getDCMotor(Axis::X);
-   op.actuatorY   = satellite.getDCMotor(Axis::Y);
-   op.actuatorZ   = satellite.getDCMotor(Axis::Z);
+	if (axis[0])
+		op.actuatorX = satellite.getDCMotor(Axis::X);
+	else
+		op.actuatorX = nullptr;
+	if (axis[1])
+		op.actuatorY = satellite.getDCMotor(Axis::Y);
+	else
+		op.actuatorY = nullptr;
+	if (axis[2])
+		op.actuatorZ = satellite.getDCMotor(Axis::Z);
+	else
+		op.actuatorZ = nullptr;
    op.imu         = satellite.getIMU();
    op.targetState = target;
 
